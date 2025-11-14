@@ -1,0 +1,20 @@
+package com.builderssas.api.application.usecase.constructionorder;
+
+import com.builderssas.api.domain.model.constructionorder.ConstructionOrder;
+import com.builderssas.api.domain.port.in.constructionorder.ListConstructionOrdersUseCase;
+import com.builderssas.api.domain.port.out.ConstructionOrderRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+
+@Service
+@RequiredArgsConstructor
+public class ListConstructionOrdersService implements ListConstructionOrdersUseCase {
+
+    private final ConstructionOrderRepository repository;
+
+    @Override
+    public Flux<ConstructionOrder> listAll() {
+        return repository.findAll();
+    }
+}
