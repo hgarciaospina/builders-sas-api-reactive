@@ -1,0 +1,3 @@
+spring:
+  application:
+    name: builders-sas-api-reactive
