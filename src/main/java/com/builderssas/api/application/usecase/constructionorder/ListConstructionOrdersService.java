@@ -1,6 +1,6 @@
 package com.builderssas.api.application.usecase.constructionorder;
 
-import com.builderssas.api.domain.model.constructionorder.ConstructionOrder;
+import com.builderssas.api.domain.model.constructionorder.ConstructionOrderRecord;
 import com.builderssas.api.domain.port.in.constructionorder.ListConstructionOrdersUseCase;
 import com.builderssas.api.domain.port.out.ConstructionOrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ public class ListConstructionOrdersService implements ListConstructionOrdersUseC
     private final ConstructionOrderRepository repository;
 
     @Override
-    public Flux<ConstructionOrder> listAll() {
+    public Flux<ConstructionOrderRecord> listAll() {
         return repository.findAll();
     }
 }

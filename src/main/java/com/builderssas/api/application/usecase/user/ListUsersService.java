@@ -1,6 +1,6 @@
 package com.builderssas.api.application.usecase.user;
 
-import com.builderssas.api.domain.model.user.User;
+import com.builderssas.api.domain.model.user.UserRecord;
 import com.builderssas.api.domain.port.in.user.ListUsersUseCase;
 import com.builderssas.api.domain.port.out.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ public class ListUsersService implements ListUsersUseCase {
     private final UserRepository repository;
 
     @Override
-    public Flux<User> listAll() {
+    public Flux<UserRecord> listAll() {
         return repository.findAll();
     }
 }

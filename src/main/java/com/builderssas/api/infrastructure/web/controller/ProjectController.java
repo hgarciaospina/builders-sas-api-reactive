@@ -1,6 +1,6 @@
 package com.builderssas.api.infrastructure.web.controller;
 
-import com.builderssas.api.domain.model.project.Project;
+import com.builderssas.api.domain.model.project.ProjectRecord;
 import com.builderssas.api.domain.port.in.project.CreateProjectUseCase;
 import com.builderssas.api.domain.port.in.project.UpdateProjectUseCase;
 import com.builderssas.api.domain.port.in.project.GetProjectUseCase;
@@ -22,23 +22,23 @@ public class ProjectController {
     private final ListProjectsUseCase listUseCase;
 
     @GetMapping
-    public Flux<Project> list() {
+    public Flux<ProjectRecord> list() {
         return listUseCase.listAll();
     }
 
     @GetMapping("/<built-in function id>")
-    public Mono<Project> get(@PathVariable Long id) {
+    public Mono<ProjectRecord> get(@PathVariable Long id) {
         return getUseCase.getById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<Project> create(@RequestBody Project body) {
+    public Mono<ProjectRecord> create(@RequestBody ProjectRecord body) {
         return createUseCase.create(body);
     }
 
     @PutMapping("/<built-in function id>")
-    public Mono<Project> update(@PathVariable Long id, @RequestBody Project body) {
+    public Mono<ProjectRecord> update(@PathVariable Long id, @RequestBody ProjectRecord body) {
         return updateUseCase.update(id, body);
     }
 }

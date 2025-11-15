@@ -1,6 +1,6 @@
 package com.builderssas.api.application.usecase.constructionrequest;
 
-import com.builderssas.api.domain.model.constructionrequest.ConstructionRequest;
+import com.builderssas.api.domain.model.constructionrequest.ConstructionRequestRecord;
 import com.builderssas.api.domain.port.in.constructionrequest.ListConstructionRequestsUseCase;
 import com.builderssas.api.domain.port.out.ConstructionRequestRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ public class ListConstructionRequestsService implements ListConstructionRequests
     private final ConstructionRequestRepository repository;
 
     @Override
-    public Flux<ConstructionRequest> listAll() {
+    public Flux<ConstructionRequestRecord> listAll() {
         return repository.findAll();
     }
 }

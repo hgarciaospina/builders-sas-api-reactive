@@ -1,6 +1,6 @@
 package com.builderssas.api.application.usecase.constructiontype;
 
-import com.builderssas.api.domain.model.construction.ConstructionType;
+import com.builderssas.api.domain.model.construction.ConstructionTypeRecord;
 import com.builderssas.api.domain.port.in.constructiontype.GetConstructionTypeUseCase;
 import com.builderssas.api.domain.port.out.ConstructionTypeRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ public class GetConstructionTypeService implements GetConstructionTypeUseCase {
     private final ConstructionTypeRepository repository;
 
     @Override
-    public Mono<ConstructionType> getById(Long id) {
+    public Mono<ConstructionTypeRecord> getById(Long id) {
         return repository.findById(id);
     }
 }

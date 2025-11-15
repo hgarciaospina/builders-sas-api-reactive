@@ -1,6 +1,6 @@
 package com.builderssas.api.infrastructure.web.controller;
 
-import com.builderssas.api.domain.model.role.Role;
+import com.builderssas.api.domain.model.role.RoleRecord;
 import com.builderssas.api.domain.port.in.role.CreateRoleUseCase;
 import com.builderssas.api.domain.port.in.role.UpdateRoleUseCase;
 import com.builderssas.api.domain.port.in.role.GetRoleUseCase;
@@ -22,23 +22,23 @@ public class RoleController {
     private final ListRolesUseCase listUseCase;
 
     @GetMapping
-    public Flux<Role> list() {
+    public Flux<RoleRecord> list() {
         return listUseCase.listAll();
     }
 
     @GetMapping("/<built-in function id>")
-    public Mono<Role> get(@PathVariable Long id) {
+    public Mono<RoleRecord> get(@PathVariable Long id) {
         return getUseCase.getById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<Role> create(@RequestBody Role body) {
+    public Mono<RoleRecord> create(@RequestBody RoleRecord body) {
         return createUseCase.create(body);
     }
 
     @PutMapping("/<built-in function id>")
-    public Mono<Role> update(@PathVariable Long id, @RequestBody Role body) {
+    public Mono<RoleRecord> update(@PathVariable Long id, @RequestBody RoleRecord body) {
         return updateUseCase.update(id, body);
     }
 }

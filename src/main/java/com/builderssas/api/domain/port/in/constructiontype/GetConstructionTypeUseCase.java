@@ -1,9 +1,9 @@
 package com.builderssas.api.domain.port.in.constructiontype;
 
-import com.builderssas.api.domain.model.construction.ConstructionType;
+import com.builderssas.api.domain.model.construction.ConstructionTypeRecord;
 import reactor.core.publisher.Mono;
 
 public interface GetConstructionTypeUseCase {
 
-    Mono<ConstructionType> getById(Long id);
+    Mono<ConstructionTypeRecord> getById(Long id);
 }

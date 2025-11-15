@@ -1,6 +1,6 @@
 package com.builderssas.api.infrastructure.persistence.adapter;
 
-import com.builderssas.api.domain.model.user.User;
+import com.builderssas.api.domain.model.user.UserRecord;
 import com.builderssas.api.domain.port.out.UserRepository;
 import com.builderssas.api.infrastructure.persistence.entity.UserEntity;
 import com.builderssas.api.infrastructure.persistence.repository.UserR2dbcRepository;
@@ -16,9 +16,9 @@ public class UserR2dbcAdapter implements UserRepository {
     private final UserR2dbcRepository repository;
 
 
-private User toDomain(UserEntity e) {
+private UserRecord toDomain(UserEntity e) {
     if (e == null) return null;
-    return new User(
+    return new UserRecord(
         e.getId(),
             e.getUsername(),
         e.getDisplayName(),
@@ -27,7 +27,7 @@ private User toDomain(UserEntity e) {
     );
 }
 
-private UserEntity toEntity(User d) {
+private UserEntity toEntity(UserRecord d) {
     if (d == null) return null;
     UserEntity e = new UserEntity();
     e.setId(d.id());
@@ -40,17 +40,17 @@ private UserEntity toEntity(User d) {
 
 
     @Override
-    public Mono<User> findById(Long id) {
+    public Mono<UserRecord> findById(Long id) {
         return repository.findById(id).map(this::toDomain);
     }
 
     @Override
-    public Flux<User> findAll() {
+    public Flux<UserRecord> findAll() {
         return repository.findAll().map(this::toDomain);
     }
 
     @Override
-    public Mono<User> save(User aggregate) {
+    public Mono<UserRecord> save(UserRecord aggregate) {
         return repository.save(toEntity(aggregate)).map(this::toDomain);
     }
 }

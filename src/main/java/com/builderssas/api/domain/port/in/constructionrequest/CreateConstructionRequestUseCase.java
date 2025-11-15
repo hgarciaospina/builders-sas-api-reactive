@@ -1,9 +1,9 @@
 package com.builderssas.api.domain.port.in.constructionrequest;
 
-import com.builderssas.api.domain.model.constructionrequest.ConstructionRequest;
+import com.builderssas.api.domain.model.constructionrequest.ConstructionRequestRecord;
 import reactor.core.publisher.Mono;
 
 public interface CreateConstructionRequestUseCase {
 
-    Mono<ConstructionRequest> create(ConstructionRequest command);
+    Mono<ConstructionRequestRecord> create(ConstructionRequestRecord command);
 }

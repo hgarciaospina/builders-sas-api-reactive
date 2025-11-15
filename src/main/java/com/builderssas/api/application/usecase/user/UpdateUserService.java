@@ -1,6 +1,6 @@
 package com.builderssas.api.application.usecase.user;
 
-import com.builderssas.api.domain.model.user.User;
+import com.builderssas.api.domain.model.user.UserRecord;
 import com.builderssas.api.domain.port.in.user.UpdateUserUseCase;
 import com.builderssas.api.domain.port.out.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,11 +14,16 @@ public class UpdateUserService implements UpdateUserUseCase {
     private final UserRepository repository;
 
     @Override
-    public Mono<User> update(Long id, User command) {
-        User updated = new User(
-            id,
-            username, displayName, email, active
+    public Mono<UserRecord> update(Long id, UserRecord command) {
+
+        UserRecord updated = new UserRecord(
+                id,
+                command.username(),
+                command.displayName(),
+                command.email(),
+                command.active()
         );
+
         return repository.save(updated);
     }
 }

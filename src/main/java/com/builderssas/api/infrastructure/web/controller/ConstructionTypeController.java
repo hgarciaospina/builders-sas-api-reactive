@@ -1,6 +1,6 @@
 package com.builderssas.api.infrastructure.web.controller;
 
-import com.builderssas.api.domain.model.construction.ConstructionType;
+import com.builderssas.api.domain.model.construction.ConstructionTypeRecord;
 import com.builderssas.api.domain.port.in.constructiontype.CreateConstructionTypeUseCase;
 import com.builderssas.api.domain.port.in.constructiontype.UpdateConstructionTypeUseCase;
 import com.builderssas.api.domain.port.in.constructiontype.GetConstructionTypeUseCase;
@@ -22,23 +22,23 @@ public class ConstructionTypeController {
     private final ListConstructionTypesUseCase listUseCase;
 
     @GetMapping
-    public Flux<ConstructionType> list() {
+    public Flux<ConstructionTypeRecord> list() {
         return listUseCase.listAll();
     }
 
     @GetMapping("/<built-in function id>")
-    public Mono<ConstructionType> get(@PathVariable Long id) {
+    public Mono<ConstructionTypeRecord> get(@PathVariable Long id) {
         return getUseCase.getById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<ConstructionType> create(@RequestBody ConstructionType body) {
+    public Mono<ConstructionTypeRecord> create(@RequestBody ConstructionTypeRecord body) {
         return createUseCase.create(body);
     }
 
     @PutMapping("/<built-in function id>")
-    public Mono<ConstructionType> update(@PathVariable Long id, @RequestBody ConstructionType body) {
+    public Mono<ConstructionTypeRecord> update(@PathVariable Long id, @RequestBody ConstructionTypeRecord body) {
         return updateUseCase.update(id, body);
     }
 }

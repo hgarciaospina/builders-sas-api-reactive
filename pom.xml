@@ -11,15 +11,16 @@
     <description>Builders-SAS backend reactivo con Spring WebFlux, R2DBC y arquitectura hexagonal.</description>
 
     <properties>
-        <java.version>21</java.version>
+        <java.version>17</java.version>
         <spring.boot.version>3.3.4</spring.boot.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
     </properties>
 
+    <!-- FIX AQUI, PAPI CHURRO REACTIVO -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>${spring.boot.version}</version>
+        <version>3.3.4</version> <!-- <- VERSION FIJA, NO VARIABLE -->
         <relativePath/>
     </parent>
 

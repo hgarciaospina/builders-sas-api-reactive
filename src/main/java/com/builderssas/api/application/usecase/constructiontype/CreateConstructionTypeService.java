@@ -1,6 +1,6 @@
 package com.builderssas.api.application.usecase.constructiontype;
 
-import com.builderssas.api.domain.model.construction.ConstructionType;
+import com.builderssas.api.domain.model.construction.ConstructionTypeRecord;
 import com.builderssas.api.domain.port.in.constructiontype.CreateConstructionTypeUseCase;
 import com.builderssas.api.domain.port.out.ConstructionTypeRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ public class CreateConstructionTypeService implements CreateConstructionTypeUseC
     private final ConstructionTypeRepository repository;
 
     @Override
-    public Mono<ConstructionType> create(ConstructionType command) {
+    public Mono<ConstructionTypeRecord> create(ConstructionTypeRecord command) {
         return repository.save(command);
     }
 }

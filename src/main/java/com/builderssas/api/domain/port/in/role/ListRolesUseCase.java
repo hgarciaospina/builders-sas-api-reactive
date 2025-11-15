@@ -1,9 +1,9 @@
 package com.builderssas.api.domain.port.in.role;
 
-import com.builderssas.api.domain.model.role.Role;
+import com.builderssas.api.domain.model.role.RoleRecord;
 import reactor.core.publisher.Flux;
 
 public interface ListRolesUseCase {
 
-    Flux<Role> listAll();
+    Flux<RoleRecord> listAll();
 }

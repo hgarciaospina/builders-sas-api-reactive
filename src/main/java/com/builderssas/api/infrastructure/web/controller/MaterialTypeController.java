@@ -1,6 +1,6 @@
 package com.builderssas.api.infrastructure.web.controller;
 
-import com.builderssas.api.domain.model.material.MaterialType;
+import com.builderssas.api.domain.model.material.MaterialTypeRecord;
 import com.builderssas.api.domain.port.in.materialtype.CreateMaterialTypeUseCase;
 import com.builderssas.api.domain.port.in.materialtype.UpdateMaterialTypeUseCase;
 import com.builderssas.api.domain.port.in.materialtype.GetMaterialTypeUseCase;
@@ -22,23 +22,23 @@ public class MaterialTypeController {
     private final ListMaterialTypesUseCase listUseCase;
 
     @GetMapping
-    public Flux<MaterialType> list() {
+    public Flux<MaterialTypeRecord> list() {
         return listUseCase.listAll();
     }
 
     @GetMapping("/<built-in function id>")
-    public Mono<MaterialType> get(@PathVariable Long id) {
+    public Mono<MaterialTypeRecord> get(@PathVariable Long id) {
         return getUseCase.getById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<MaterialType> create(@RequestBody MaterialType body) {
+    public Mono<MaterialTypeRecord> create(@RequestBody MaterialTypeRecord body) {
         return createUseCase.create(body);
     }
 
     @PutMapping("/<built-in function id>")
-    public Mono<MaterialType> update(@PathVariable Long id, @RequestBody MaterialType body) {
+    public Mono<MaterialTypeRecord> update(@PathVariable Long id, @RequestBody MaterialTypeRecord body) {
         return updateUseCase.update(id, body);
     }
 }

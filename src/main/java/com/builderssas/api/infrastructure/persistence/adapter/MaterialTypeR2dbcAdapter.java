@@ -1,6 +1,6 @@
 package com.builderssas.api.infrastructure.persistence.adapter;
 
-import com.builderssas.api.domain.model.material.MaterialType;
+import com.builderssas.api.domain.model.material.MaterialTypeRecord;
 import com.builderssas.api.domain.port.out.MaterialTypeRepository;
 import com.builderssas.api.infrastructure.persistence.entity.MaterialTypeEntity;
 import com.builderssas.api.infrastructure.persistence.repository.MaterialTypeR2dbcRepository;
@@ -16,9 +16,9 @@ public class MaterialTypeR2dbcAdapter implements MaterialTypeRepository {
     private final MaterialTypeR2dbcRepository repository;
 
 
-private MaterialType toDomain(MaterialTypeEntity e) {
+private MaterialTypeRecord toDomain(MaterialTypeEntity e) {
     if (e == null) return null;
-    return new MaterialType(
+    return new MaterialTypeRecord(
         e.getId(),
             e.getName(),
         e.getUnit(),
@@ -26,7 +26,7 @@ private MaterialType toDomain(MaterialTypeEntity e) {
     );
 }
 
-private MaterialTypeEntity toEntity(MaterialType d) {
+private MaterialTypeEntity toEntity(MaterialTypeRecord d) {
     if (d == null) return null;
     MaterialTypeEntity e = new MaterialTypeEntity();
     e.setId(d.id());
@@ -38,17 +38,17 @@ private MaterialTypeEntity toEntity(MaterialType d) {
 
 
     @Override
-    public Mono<MaterialType> findById(Long id) {
+    public Mono<MaterialTypeRecord> findById(Long id) {
         return repository.findById(id).map(this::toDomain);
     }
 
     @Override
-    public Flux<MaterialType> findAll() {
+    public Flux<MaterialTypeRecord> findAll() {
         return repository.findAll().map(this::toDomain);
     }
 
     @Override
-    public Mono<MaterialType> save(MaterialType aggregate) {
+    public Mono<MaterialTypeRecord> save(MaterialTypeRecord aggregate) {
         return repository.save(toEntity(aggregate)).map(this::toDomain);
     }
 }

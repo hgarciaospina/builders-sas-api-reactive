@@ -1,6 +1,6 @@
 package com.builderssas.api.infrastructure.persistence.adapter;
 
-import com.builderssas.api.domain.model.role.Role;
+import com.builderssas.api.domain.model.role.RoleRecord;
 import com.builderssas.api.domain.port.out.RoleRepository;
 import com.builderssas.api.infrastructure.persistence.entity.RoleEntity;
 import com.builderssas.api.infrastructure.persistence.repository.RoleR2dbcRepository;
@@ -16,9 +16,9 @@ public class RoleR2dbcAdapter implements RoleRepository {
     private final RoleR2dbcRepository repository;
 
 
-private Role toDomain(RoleEntity e) {
+private RoleRecord toDomain(RoleEntity e) {
     if (e == null) return null;
-    return new Role(
+    return new RoleRecord(
         e.getId(),
             e.getName(),
         e.getDescription(),
@@ -26,7 +26,7 @@ private Role toDomain(RoleEntity e) {
     );
 }
 
-private RoleEntity toEntity(Role d) {
+private RoleEntity toEntity(RoleRecord d) {
     if (d == null) return null;
     RoleEntity e = new RoleEntity();
     e.setId(d.id());
@@ -38,17 +38,17 @@ private RoleEntity toEntity(Role d) {
 
 
     @Override
-    public Mono<Role> findById(Long id) {
+    public Mono<RoleRecord> findById(Long id) {
         return repository.findById(id).map(this::toDomain);
     }
 
     @Override
-    public Flux<Role> findAll() {
+    public Flux<RoleRecord> findAll() {
         return repository.findAll().map(this::toDomain);
     }
 
     @Override
-    public Mono<Role> save(Role aggregate) {
+    public Mono<RoleRecord> save(RoleRecord aggregate) {
         return repository.save(toEntity(aggregate)).map(this::toDomain);
     }
 }

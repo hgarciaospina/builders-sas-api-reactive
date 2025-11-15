@@ -1,6 +1,6 @@
 package com.builderssas.api.application.usecase.materialtype;
 
-import com.builderssas.api.domain.model.material.MaterialType;
+import com.builderssas.api.domain.model.material.MaterialTypeRecord;
 import com.builderssas.api.domain.port.in.materialtype.CreateMaterialTypeUseCase;
 import com.builderssas.api.domain.port.out.MaterialTypeRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ public class CreateMaterialTypeService implements CreateMaterialTypeUseCase {
     private final MaterialTypeRepository repository;
 
     @Override
-    public Mono<MaterialType> create(MaterialType command) {
+    public Mono<MaterialTypeRecord> create(MaterialTypeRecord command) {
         return repository.save(command);
     }
 }

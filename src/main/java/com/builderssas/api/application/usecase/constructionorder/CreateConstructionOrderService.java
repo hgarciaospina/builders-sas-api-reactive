@@ -1,6 +1,6 @@
 package com.builderssas.api.application.usecase.constructionorder;
 
-import com.builderssas.api.domain.model.constructionorder.ConstructionOrder;
+import com.builderssas.api.domain.model.constructionorder.ConstructionOrderRecord;
 import com.builderssas.api.domain.port.in.constructionorder.CreateConstructionOrderUseCase;
 import com.builderssas.api.domain.port.out.ConstructionOrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ public class CreateConstructionOrderService implements CreateConstructionOrderUs
     private final ConstructionOrderRepository repository;
 
     @Override
-    public Mono<ConstructionOrder> create(ConstructionOrder command) {
+    public Mono<ConstructionOrderRecord> create(ConstructionOrderRecord command) {
         return repository.save(command);
     }
 }

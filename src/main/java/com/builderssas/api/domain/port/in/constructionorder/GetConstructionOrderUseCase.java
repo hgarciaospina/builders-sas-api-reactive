@@ -1,9 +1,12 @@
 package com.builderssas.api.domain.port.in.constructionorder;
 
-import com.builderssas.api.domain.model.constructionorder.ConstructionOrder;
+import com.builderssas.api.domain.model.constructionorder.ConstructionOrderRecord;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface GetConstructionOrderUseCase {
 
-    Mono<ConstructionOrder> getById(Long id);
+    Mono<ConstructionOrderRecord> findById(Long id);
+
+    Flux<ConstructionOrderRecord> findAll();
 }

@@ -1,9 +1,9 @@
 package com.builderssas.api.domain.port.in.project;
 
-import com.builderssas.api.domain.model.project.Project;
+import com.builderssas.api.domain.model.project.ProjectRecord;
 import reactor.core.publisher.Mono;
 
 public interface UpdateProjectUseCase {
 
-    Mono<Project> update(Long id, Project command);
+    Mono<ProjectRecord> update(Long id, ProjectRecord command);
 }

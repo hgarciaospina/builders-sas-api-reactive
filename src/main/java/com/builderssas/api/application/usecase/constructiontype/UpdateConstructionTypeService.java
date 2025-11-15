@@ -1,6 +1,6 @@
 package com.builderssas.api.application.usecase.constructiontype;
 
-import com.builderssas.api.domain.model.construction.ConstructionType;
+import com.builderssas.api.domain.model.construction.ConstructionTypeRecord;
 import com.builderssas.api.domain.port.in.constructiontype.UpdateConstructionTypeUseCase;
 import com.builderssas.api.domain.port.out.ConstructionTypeRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,11 +14,15 @@ public class UpdateConstructionTypeService implements UpdateConstructionTypeUseC
     private final ConstructionTypeRepository repository;
 
     @Override
-    public Mono<ConstructionType> update(Long id, ConstructionType command) {
-        ConstructionType updated = new ConstructionType(
-            id,
-            name, estimatedDays, active
+    public Mono<ConstructionTypeRecord> update(Long id, ConstructionTypeRecord command) {
+
+        ConstructionTypeRecord updated = new ConstructionTypeRecord(
+                id,
+                command.name(),
+                command.estimatedDays(),
+                command.active()
         );
+
         return repository.save(updated);
     }
 }

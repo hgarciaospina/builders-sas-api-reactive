@@ -1,6 +1,6 @@
 package com.builderssas.api.application.usecase.role;
 
-import com.builderssas.api.domain.model.role.Role;
+import com.builderssas.api.domain.model.role.RoleRecord;
 import com.builderssas.api.domain.port.in.role.UpdateRoleUseCase;
 import com.builderssas.api.domain.port.out.RoleRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,11 +14,15 @@ public class UpdateRoleService implements UpdateRoleUseCase {
     private final RoleRepository repository;
 
     @Override
-    public Mono<Role> update(Long id, Role command) {
-        Role updated = new Role(
-            id,
-            name, description, active
+    public Mono<RoleRecord> update(Long id, RoleRecord command) {
+
+        RoleRecord updated = new RoleRecord(
+                id,
+                command.name(),
+                command.description(),
+                command.active()
         );
+
         return repository.save(updated);
     }
 }

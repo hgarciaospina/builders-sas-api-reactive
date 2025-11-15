@@ -1,8 +1,7 @@
 package com.builderssas.api.infrastructure.web.controller;
 
-import com.builderssas.api.domain.model.constructionrequest.ConstructionRequest;
+import com.builderssas.api.domain.model.constructionrequest.ConstructionRequestRecord;
 import com.builderssas.api.domain.port.in.constructionrequest.CreateConstructionRequestUseCase;
-import com.builderssas.api.domain.port.in.constructionrequest.UpdateConstructionRequestUseCase;
 import com.builderssas.api.domain.port.in.constructionrequest.GetConstructionRequestUseCase;
 import com.builderssas.api.domain.port.in.constructionrequest.ListConstructionRequestsUseCase;
 import lombok.RequiredArgsConstructor;
@@ -12,33 +11,30 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/api/v1/constructionrequests")
+@RequestMapping("/api/v1/construction-requests")
 @RequiredArgsConstructor
 public class ConstructionRequestController {
 
     private final CreateConstructionRequestUseCase createUseCase;
-    private final UpdateConstructionRequestUseCase updateUseCase;
     private final GetConstructionRequestUseCase getUseCase;
     private final ListConstructionRequestsUseCase listUseCase;
 
+    // LIST ALL
     @GetMapping
-    public Flux<ConstructionRequest> list() {
+    public Flux<ConstructionRequestRecord> listAll() {
         return listUseCase.listAll();
     }
 
-    @GetMapping("/<built-in function id>")
-    public Mono<ConstructionRequest> get(@PathVariable Long id) {
-        return getUseCase.getById(id);
+    // GET BY ID
+    @GetMapping("/{id}")
+    public Mono<ConstructionRequestRecord> findById(@PathVariable Long id) {
+        return getUseCase.findById(id);
     }
 
+    // CREATE
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<ConstructionRequest> create(@RequestBody ConstructionRequest body) {
+    public Mono<ConstructionRequestRecord> create(@RequestBody ConstructionRequestRecord body) {
         return createUseCase.create(body);
-    }
-
-    @PutMapping("/<built-in function id>")
-    public Mono<ConstructionRequest> update(@PathVariable Long id, @RequestBody ConstructionRequest body) {
-        return updateUseCase.update(id, body);
     }
 }

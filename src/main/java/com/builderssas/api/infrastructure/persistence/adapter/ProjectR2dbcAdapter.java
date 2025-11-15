@@ -1,6 +1,6 @@
 package com.builderssas.api.infrastructure.persistence.adapter;
 
-import com.builderssas.api.domain.model.project.Project;
+import com.builderssas.api.domain.model.project.ProjectRecord;
 import com.builderssas.api.domain.port.out.ProjectRepository;
 import com.builderssas.api.infrastructure.persistence.entity.ProjectEntity;
 import com.builderssas.api.infrastructure.persistence.repository.ProjectR2dbcRepository;
@@ -16,9 +16,9 @@ public class ProjectR2dbcAdapter implements ProjectRepository {
     private final ProjectR2dbcRepository repository;
 
 
-private Project toDomain(ProjectEntity e) {
+private ProjectRecord toDomain(ProjectEntity e) {
     if (e == null) return null;
-    return new Project(
+    return new ProjectRecord(
         e.getId(),
             e.getName(),
         e.getCode(),
@@ -26,7 +26,7 @@ private Project toDomain(ProjectEntity e) {
     );
 }
 
-private ProjectEntity toEntity(Project d) {
+private ProjectEntity toEntity(ProjectRecord d) {
     if (d == null) return null;
     ProjectEntity e = new ProjectEntity();
     e.setId(d.id());
@@ -38,17 +38,17 @@ private ProjectEntity toEntity(Project d) {
 
 
     @Override
-    public Mono<Project> findById(Long id) {
+    public Mono<ProjectRecord> findById(Long id) {
         return repository.findById(id).map(this::toDomain);
     }
 
     @Override
-    public Flux<Project> findAll() {
+    public Flux<ProjectRecord> findAll() {
         return repository.findAll().map(this::toDomain);
     }
 
     @Override
-    public Mono<Project> save(Project aggregate) {
+    public Mono<ProjectRecord> save(ProjectRecord aggregate) {
         return repository.save(toEntity(aggregate)).map(this::toDomain);
     }
 }

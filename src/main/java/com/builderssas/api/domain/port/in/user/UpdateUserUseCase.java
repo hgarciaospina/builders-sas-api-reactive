@@ -1,9 +1,9 @@
 package com.builderssas.api.domain.port.in.user;
 
-import com.builderssas.api.domain.model.user.User;
+import com.builderssas.api.domain.model.user.UserRecord;
 import reactor.core.publisher.Mono;
 
 public interface UpdateUserUseCase {
 
-    Mono<User> update(Long id, User command);
+    Mono<UserRecord> update(Long id, UserRecord command);
 }

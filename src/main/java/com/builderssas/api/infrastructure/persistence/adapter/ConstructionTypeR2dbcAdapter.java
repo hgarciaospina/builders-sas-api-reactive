@@ -1,6 +1,6 @@
 package com.builderssas.api.infrastructure.persistence.adapter;
 
-import com.builderssas.api.domain.model.construction.ConstructionType;
+import com.builderssas.api.domain.model.construction.ConstructionTypeRecord;
 import com.builderssas.api.domain.port.out.ConstructionTypeRepository;
 import com.builderssas.api.infrastructure.persistence.entity.ConstructionTypeEntity;
 import com.builderssas.api.infrastructure.persistence.repository.ConstructionTypeR2dbcRepository;
@@ -16,9 +16,9 @@ public class ConstructionTypeR2dbcAdapter implements ConstructionTypeRepository 
     private final ConstructionTypeR2dbcRepository repository;
 
 
-private ConstructionType toDomain(ConstructionTypeEntity e) {
+private ConstructionTypeRecord toDomain(ConstructionTypeEntity e) {
     if (e == null) return null;
-    return new ConstructionType(
+    return new ConstructionTypeRecord(
         e.getId(),
             e.getName(),
         e.getEstimatedDays(),
@@ -26,7 +26,7 @@ private ConstructionType toDomain(ConstructionTypeEntity e) {
     );
 }
 
-private ConstructionTypeEntity toEntity(ConstructionType d) {
+private ConstructionTypeEntity toEntity(ConstructionTypeRecord d) {
     if (d == null) return null;
     ConstructionTypeEntity e = new ConstructionTypeEntity();
     e.setId(d.id());
@@ -38,17 +38,17 @@ private ConstructionTypeEntity toEntity(ConstructionType d) {
 
 
     @Override
-    public Mono<ConstructionType> findById(Long id) {
+    public Mono<ConstructionTypeRecord> findById(Long id) {
         return repository.findById(id).map(this::toDomain);
     }
 
     @Override
-    public Flux<ConstructionType> findAll() {
+    public Flux<ConstructionTypeRecord> findAll() {
         return repository.findAll().map(this::toDomain);
     }
 
     @Override
-    public Mono<ConstructionType> save(ConstructionType aggregate) {
+    public Mono<ConstructionTypeRecord> save(ConstructionTypeRecord aggregate) {
         return repository.save(toEntity(aggregate)).map(this::toDomain);
     }
 }

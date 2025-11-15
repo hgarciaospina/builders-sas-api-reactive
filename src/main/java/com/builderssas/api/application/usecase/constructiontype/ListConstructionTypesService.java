@@ -1,6 +1,6 @@
 package com.builderssas.api.application.usecase.constructiontype;
 
-import com.builderssas.api.domain.model.construction.ConstructionType;
+import com.builderssas.api.domain.model.construction.ConstructionTypeRecord;
 import com.builderssas.api.domain.port.in.constructiontype.ListConstructionTypesUseCase;
 import com.builderssas.api.domain.port.out.ConstructionTypeRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,7 @@ public class ListConstructionTypesService implements ListConstructionTypesUseCas
     private final ConstructionTypeRepository repository;
 
     @Override
-    public Flux<ConstructionType> listAll() {
+    public Flux<ConstructionTypeRecord> listAll() {
         return repository.findAll();
     }
 }
