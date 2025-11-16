@@ -4,18 +4,28 @@ import com.builderssas.api.domain.model.constructionorder.ConstructionOrderRecor
 import com.builderssas.api.domain.port.out.ConstructionOrderRepository;
 import com.builderssas.api.infrastructure.persistence.mapper.ConstructionOrderMapper;
 import com.builderssas.api.infrastructure.persistence.repository.ConstructionOrderR2dbcRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * Adaptador encargado de conectar el dominio con la infraestructura R2DBC
- * para operaciones sobre órdenes de construcción. Su rol consiste en:
- * - Delegar operaciones al repositorio reactivo.
- * - Convertir entre entity ↔ record utilizando el mapper funcional.
+ * Adaptador de persistencia R2DBC para la entidad ConstructionOrder.
  *
- * No contiene lógica de negocio, ni lógica imperativa.
+ * Su responsabilidad es conectar el dominio con la infraestructura reactiva,
+ * garantizando una transformación pura y funcional entre:
+ *
+ *     • ConstructionOrderEntity  ↔  ConstructionOrderRecord
+ *
+ * Este adaptador:
+ *   - No contiene lógica imperativa.
+ *   - No ejecuta validaciones de negocio.
+ *   - No muta estado.
+ *   - Se limita a delegar operaciones al repositorio reactivo
+ *     y aplicar mapeo funcional mediante ConstructionOrderMapper.
+ *
+ * Cumple estrictamente los principios de Arquitectura Hexagonal.
  */
 @Component
 @RequiredArgsConstructor
@@ -25,10 +35,10 @@ public class ConstructionOrderR2dbcAdapter implements ConstructionOrderRepositor
     private final ConstructionOrderMapper mapper;
 
     /**
-     * Obtiene una orden por su identificador.
+     * Recupera una orden por su identificador.
      *
-     * @param id identificador de la orden
-     * @return orden equivalente en el dominio
+     * @param id identificador único de la orden
+     * @return Mono con la orden encontrada o vacío si no existe
      */
     @Override
     public Mono<ConstructionOrderRecord> findById(Long id) {
@@ -39,8 +49,8 @@ public class ConstructionOrderR2dbcAdapter implements ConstructionOrderRepositor
     /**
      * Recupera todas las órdenes asociadas a un proyecto.
      *
-     * @param projectId id del proyecto
-     * @return flujo de órdenes del dominio
+     * @param projectId identificador del proyecto
+     * @return Flux con todas las órdenes del proyecto
      */
     @Override
     public Flux<ConstructionOrderRecord> findByProjectId(Long projectId) {
@@ -49,10 +59,10 @@ public class ConstructionOrderR2dbcAdapter implements ConstructionOrderRepositor
     }
 
     /**
-     * Recupera la última orden basada en la fecha de finalización programada.
+     * Recupera la última orden registrada según fecha de finalización programada.
      *
-     * @param projectId id del proyecto
-     * @return última orden encontrada
+     * @param projectId identificador del proyecto
+     * @return Mono con la última orden o vacío si no existen registros
      */
     @Override
     public Mono<ConstructionOrderRecord> findLastByProjectId(Long projectId) {
@@ -63,7 +73,7 @@ public class ConstructionOrderR2dbcAdapter implements ConstructionOrderRepositor
     /**
      * Recupera todas las órdenes almacenadas.
      *
-     * @return flujo de todas las órdenes
+     * @return Flux con todas las órdenes del sistema
      */
     @Override
     public Flux<ConstructionOrderRecord> findAll() {
@@ -72,10 +82,10 @@ public class ConstructionOrderR2dbcAdapter implements ConstructionOrderRepositor
     }
 
     /**
-     * Persiste una orden mediante R2DBC.
+     * Persiste o actualiza una orden de construcción.
      *
-     * @param aggregate record del dominio
-     * @return orden persistida retornada como record
+     * @param aggregate instancia inmutable del dominio
+     * @return Mono con la orden persistida convertida nuevamente a record
      */
     @Override
     public Mono<ConstructionOrderRecord> save(ConstructionOrderRecord aggregate) {

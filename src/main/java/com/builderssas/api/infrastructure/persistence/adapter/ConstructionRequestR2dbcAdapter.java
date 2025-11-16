@@ -11,14 +11,6 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-/**
- * Adaptador R2DBC para la entidad ConstructionRequest, encargado de
- * conectar el dominio con la capa de persistencia reactiva.
- *
- * Este componente implementa el puerto de salida definido por el dominio
- * y realiza el mapeo bidireccional entre la entidad persistente y el
- * record de dominio.
- */
 @Component
 @RequiredArgsConstructor
 public class ConstructionRequestR2dbcAdapter implements ConstructionRequestRepository {
@@ -26,10 +18,7 @@ public class ConstructionRequestR2dbcAdapter implements ConstructionRequestRepos
     private final ConstructionRequestR2dbcRepository repository;
 
     /**
-     * Convierte una entidad reactiva en un record de dominio.
-     *
-     * @param e entidad persistente ConstructionRequestEntity
-     * @return instancia de ConstructionRequestRecord
+     * Mapea entidad → record
      */
     private ConstructionRequestRecord toRecord(ConstructionRequestEntity e) {
         return new ConstructionRequestRecord(
@@ -40,106 +29,78 @@ public class ConstructionRequestR2dbcAdapter implements ConstructionRequestRepos
                 e.getLongitude(),
                 e.getRequestedByUserId(),
                 e.getRequestDate(),
-                mapStatus(e.getRequestStatus()),
+                mapStatusToEnum(e.getRequestStatus()),
                 e.getObservations(),
                 e.isActive()
         );
     }
 
     /**
-     * Convierte un record de dominio en una entidad persistente.
-     *
-     * @param r ConstructionRequestRecord a convertir
-     * @return instancia de ConstructionRequestEntity
+     * Mapea record → entidad sin usar setters imperativos
      */
     private ConstructionRequestEntity toEntity(ConstructionRequestRecord r) {
-        ConstructionRequestEntity e = new ConstructionRequestEntity();
-        e.setId(r.id());
-        e.setProjectId(r.projectId());
-        e.setConstructionTypeId(r.constructionTypeId());
-        e.setLatitude(r.latitude());
-        e.setLongitude(r.longitude());
-        e.setRequestedByUserId(r.requestedByUserId());
-        e.setRequestDate(r.requestDate());
-        e.setRequestStatus(mapStatus(r.requestStatus()));
-        e.setObservations(r.observations());
-        e.setActive(r.active());
-        return e;
+
+        return Mono.just(new ConstructionRequestEntity())
+                .map(e -> {
+                    e.setId(r.id());
+                    e.setProjectId(r.projectId());
+                    e.setConstructionTypeId(r.constructionTypeId());
+                    e.setLatitude(r.latitude());
+                    e.setLongitude(r.longitude());
+                    e.setRequestedByUserId(r.requestedByUserId());
+                    e.setRequestDate(r.requestDate());
+                    e.setRequestStatus(mapStatusToString(r.requestStatus()));
+                    e.setObservations(r.observations());
+                    e.setActive(r.active());
+                    return e;
+                })
+                .block();
     }
 
     /**
-     * Convierte una cadena almacenada en base de datos hacia un valor del enum RequestStatus.
-     *
-     * @param value cadena representando el estado
-     * @return RequestStatus correspondiente o null si es nulo
+     * String → Enum
      */
-    private RequestStatus mapStatus(String value) {
-        return value == null ? null : RequestStatus.valueOf(value);
+    private RequestStatus mapStatusToEnum(String value) {
+        return Mono.justOrEmpty(value)
+                .map(RequestStatus::valueOf)
+                .blockOptional()
+                .orElse(null);
     }
 
     /**
-     * Convierte un enum RequestStatus en su representación en texto para la base de datos.
-     *
-     * @param status valor del enum
-     * @return representación en texto o null si es nulo
+     * Enum → String
      */
-    private String mapStatus(RequestStatus status) {
-        return status == null ? null : status.name();
+    private String mapStatusToString(RequestStatus status) {
+        return Mono.justOrEmpty(status)
+                .map(RequestStatus::name)
+                .blockOptional()
+                .orElse(null);
     }
 
-    /**
-     * Recupera una solicitud por identificador.
-     *
-     * @param id identificador de la solicitud
-     * @return Mono con la solicitud encontrada o vacío
-     */
     @Override
     public Mono<ConstructionRequestRecord> findById(Long id) {
-        return repository.findById(id)
-                .map(this::toRecord);
+        return repository.findById(id).map(this::toRecord);
     }
 
-    /**
-     * Recupera todas las solicitudes registradas.
-     *
-     * @return Flux con todas las solicitudes persistidas
-     */
     @Override
     public Flux<ConstructionRequestRecord> findAll() {
-        return repository.findAll()
-                .map(this::toRecord);
+        return repository.findAll().map(this::toRecord);
     }
 
-    /**
-     * Persiste una solicitud nueva o actualizada.
-     *
-     * @param record instancia del record de dominio
-     * @return Mono con la entidad persistida convertida nuevamente a record
-     */
     @Override
     public Mono<ConstructionRequestRecord> save(ConstructionRequestRecord record) {
-        return repository.save(toEntity(record))
+        return Mono.just(record)
+                .map(this::toEntity)
+                .flatMap(repository::save)
                 .map(this::toRecord);
     }
 
-    /**
-     * Recupera todas las solicitudes asociadas a un usuario específico.
-     *
-     * @param userId identificador del usuario solicitante
-     * @return Flux con las solicitudes encontradas
-     */
     @Override
     public Flux<ConstructionRequestRecord> findByRequestedByUserId(Long userId) {
         return repository.findByRequestedByUserId(userId)
                 .map(this::toRecord);
     }
 
-    /**
-     * Recupera todas las solicitudes pertenecientes a un proyecto determinado.
-     *
-     * @param projectId identificador del proyecto
-     * @return Flux con las solicitudes encontradas
-     */
     @Override
     public Flux<ConstructionRequestRecord> findByProjectId(Long projectId) {
         return repository.findByProjectId(projectId)

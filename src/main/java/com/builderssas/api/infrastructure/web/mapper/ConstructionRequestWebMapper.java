@@ -18,17 +18,16 @@ public class ConstructionRequestWebMapper {
      * Convierte un DTO de creación en un record del dominio.
      *
      * @param dto datos enviados por el cliente
-     * @param requestedByUserId usuario creador (se integrará con JWT más adelante)
      * @return ConstructionRequestRecord consistente con el modelo del dominio
      */
-    public ConstructionRequestRecord toRecord(ConstructionRequestCreateDto dto, Long requestedByUserId) {
+    public ConstructionRequestRecord toRecord(ConstructionRequestCreateDto dto) {
         return new ConstructionRequestRecord(
                 null,                     // id
                 dto.projectId(),          // projectId
                 dto.constructionTypeId(), // constructionTypeId
                 dto.latitude(),           // latitude
                 dto.longitude(),          // longitude
-                requestedByUserId,        // requestedByUserId
+                null,                     // requestedByUserId (se integrará con JWT)
                 LocalDate.now(),          // requestDate
                 null,                     // requestStatus (se asigna después)
                 null,                     // observations (se asigna después)
