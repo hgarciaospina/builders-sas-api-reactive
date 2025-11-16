@@ -4,8 +4,8 @@ import com.builderssas.api.domain.model.construction.ConstructionTypeRecord;
 import com.builderssas.api.domain.model.constructionorder.ConstructionOrderRecord;
 import com.builderssas.api.domain.model.constructionrequest.ConstructionRequestRecord;
 import com.builderssas.api.domain.model.enums.OrderStatus;
-import com.builderssas.api.domain.port.out.ConstructionOrderRepository;
-import com.builderssas.api.domain.port.out.ConstructionTypeRepository;
+import com.builderssas.api.domain.port.out.constructionorder.ConstructionOrderRepositoryPort;
+import com.builderssas.api.domain.port.out.constructiontype.ConstructionTypeRepositoryPort;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -33,8 +33,8 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class CreateConstructionOrderFromRequestService {
 
-    private final ConstructionOrderRepository orderRepository;
-    private final ConstructionTypeRepository typeRepository;
+    private final ConstructionOrderRepositoryPort orderRepository;
+    private final ConstructionTypeRepositoryPort typeRepository;
 
     /**
      * Genera la orden aplicando las reglas de encadenamiento descritas arriba.

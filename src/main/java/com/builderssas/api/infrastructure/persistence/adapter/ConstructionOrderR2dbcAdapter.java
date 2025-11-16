@@ -1,7 +1,7 @@
 package com.builderssas.api.infrastructure.persistence.adapter;
 
 import com.builderssas.api.domain.model.constructionorder.ConstructionOrderRecord;
-import com.builderssas.api.domain.port.out.ConstructionOrderRepository;
+import com.builderssas.api.domain.port.out.constructionorder.ConstructionOrderRepositoryPort;
 import com.builderssas.api.infrastructure.persistence.mapper.ConstructionOrderMapper;
 import com.builderssas.api.infrastructure.persistence.repository.ConstructionOrderR2dbcRepository;
 
@@ -29,7 +29,7 @@ import reactor.core.publisher.Mono;
  */
 @Component
 @RequiredArgsConstructor
-public class ConstructionOrderR2dbcAdapter implements ConstructionOrderRepository {
+public class ConstructionOrderR2dbcAdapter implements ConstructionOrderRepositoryPort {
 
     private final ConstructionOrderR2dbcRepository repository;
     private final ConstructionOrderMapper mapper;

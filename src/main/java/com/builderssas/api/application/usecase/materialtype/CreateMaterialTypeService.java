@@ -1,8 +1,8 @@
 package com.builderssas.api.application.usecase.materialtype;
 
-import com.builderssas.api.domain.model.material.MaterialTypeRecord;
+import com.builderssas.api.domain.model.materialtype.MaterialTypeRecord;
 import com.builderssas.api.domain.port.in.materialtype.CreateMaterialTypeUseCase;
-import com.builderssas.api.domain.port.out.MaterialTypeRepository;
+import com.builderssas.api.domain.port.out.materialtype.MaterialTypeRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class CreateMaterialTypeService implements CreateMaterialTypeUseCase {
 
-    private final MaterialTypeRepository repository;
+    private final MaterialTypeRepositoryPort repository;
 
     @Override
     public Mono<MaterialTypeRecord> create(MaterialTypeRecord command) {

@@ -1,7 +1,7 @@
 package com.builderssas.api.application.service;
 
 import com.builderssas.api.domain.model.construction.ConstructionTypeRecord;
-import com.builderssas.api.domain.port.out.ConstructionTypeRepository;
+import com.builderssas.api.domain.port.out.constructiontype.ConstructionTypeRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class ConstructionTypeService {
 
-  private final ConstructionTypeRepository repo;
+  private final ConstructionTypeRepositoryPort repo;
 
   public Flux<ConstructionTypeRecord> all() {
     return repo.findAll();

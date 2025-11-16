@@ -1,6 +1,6 @@
 package com.builderssas.api.domain.port.in.materialtype;
 
-import com.builderssas.api.domain.model.material.MaterialTypeRecord;
+import com.builderssas.api.domain.model.materialtype.MaterialTypeRecord;
 import reactor.core.publisher.Mono;
 
 public interface UpdateMaterialTypeUseCase {

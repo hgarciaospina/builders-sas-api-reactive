@@ -9,65 +9,88 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * Entity R2DBC que representa la tabla `construction_orders`.
- * Se utiliza exclusivamente en la capa de persistencia para mapear
- * columnas de la base de datos a campos simples (sin relaciones).
+ * Entidad persistente que representa una orden de construcción.
  *
- * Esta clase no contiene lógica de negocio; su función es ser un
- * contenedor de datos para las operaciones reactivas de lectura y escritura.
+ * Su misión es mapear directamente la tabla "construction_orders"
+ * dentro de la base de datos utilizando R2DBC.
+ *
+ * No contiene lógica de negocio. Es un contenedor de datos para
+ * la capa de infraestructura y las operaciones reactivas.
  */
 @Table("construction_orders")
 public class ConstructionOrderEntity {
 
+    /** Identificador único de la orden. */
     @Id
+    @Column("id")
     private Long id;
 
+    /** ID de la solicitud de construcción asociada. */
     @Column("construction_request_id")
     private Long constructionRequestId;
 
+    /** ID del proyecto al que pertenece esta orden. */
     @Column("project_id")
     private Long projectId;
 
+    /** ID del tipo de construcción utilizado. */
     @Column("construction_type_id")
     private Long constructionTypeId;
 
+    /** ID del usuario que solicitó originalmente esta orden. */
     @Column("requested_by_user_id")
     private Long requestedByUserId;
 
+    /** Latitud de la ubicación de la construcción. */
+    @Column("latitude")
     private Double latitude;
+
+    /** Longitud de la ubicación de la construcción. */
+    @Column("longitude")
     private Double longitude;
 
+    /** Fecha en que se creó la solicitud original. */
     @Column("requested_date")
     private LocalDate requestedDate;
 
+    /** Fecha programada para el inicio de la construcción. */
     @Column("scheduled_start_date")
     private LocalDate scheduledStartDate;
 
+    /** Fecha programada de finalización. */
     @Column("scheduled_end_date")
     private LocalDate scheduledEndDate;
 
+    /** Estado actual de la orden. */
     @Column("order_status")
     private OrderStatus orderStatus;
 
+    /** Fecha de creación del registro. */
     @Column("created_at")
     private LocalDateTime createdAt;
 
+    /** Fecha de última actualización del registro. */
     @Column("updated_at")
     private LocalDateTime updatedAt;
 
+    /** Observaciones generadas por el sistema (consumos, cálculos, etc). */
+    @Column("observations")
     private String observations;
 
+    /** Indicador de si la orden está activa. */
+    @Column("active")
     private Boolean active;
 
-    // ---------------------------------------------------------
-    //  Constructor vacío (NECESARIO para R2DBC)
-    // ---------------------------------------------------------
-    public ConstructionOrderEntity() {
-    }
+    // ============================================================================================
+    // CONSTRUCTORES
+    // ============================================================================================
 
-    // ---------------------------------------------------------
-    //  Constructor completo (usado por el mapper funcional)
-    // ---------------------------------------------------------
+    /** Constructor vacío requerido por R2DBC. */
+    public ConstructionOrderEntity() {}
+
+    /**
+     * Constructor completo utilizado por mappers funcionales.
+     */
     public ConstructionOrderEntity(
             Long id,
             Long constructionRequestId,
@@ -102,9 +125,9 @@ public class ConstructionOrderEntity {
         this.active = active;
     }
 
-    // ---------------------------------------------------------
-    //  Getters y Setters (NO se eliminan ni cambian)
-    // ---------------------------------------------------------
+    // ============================================================================================
+    // GETTERS & SETTERS
+    // ============================================================================================
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }

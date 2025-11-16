@@ -2,7 +2,7 @@ package com.builderssas.api.application.usecase.project;
 
 import com.builderssas.api.domain.model.project.ProjectRecord;
 import com.builderssas.api.domain.port.in.project.UpdateProjectUseCase;
-import com.builderssas.api.domain.port.out.ProjectRepository;
+import com.builderssas.api.domain.port.out.project.ProjectRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class UpdateProjectService implements UpdateProjectUseCase {
 
-    private final ProjectRepository repository;
+    private final ProjectRepositoryPort repository;
 
     @Override
     public Mono<ProjectRecord> update(Long id, ProjectRecord command) {

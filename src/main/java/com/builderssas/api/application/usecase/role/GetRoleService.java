@@ -2,7 +2,7 @@ package com.builderssas.api.application.usecase.role;
 
 import com.builderssas.api.domain.model.role.RoleRecord;
 import com.builderssas.api.domain.port.in.role.GetRoleUseCase;
-import com.builderssas.api.domain.port.out.RoleRepository;
+import com.builderssas.api.domain.port.out.role.RoleRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class GetRoleService implements GetRoleUseCase {
 
-    private final RoleRepository repository;
+    private final RoleRepositoryPort repository;
 
     @Override
     public Mono<RoleRecord> getById(Long id) {

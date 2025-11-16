@@ -2,7 +2,7 @@ package com.builderssas.api.application.usecase.constructiontype;
 
 import com.builderssas.api.domain.model.construction.ConstructionTypeRecord;
 import com.builderssas.api.domain.port.in.constructiontype.UpdateConstructionTypeUseCase;
-import com.builderssas.api.domain.port.out.ConstructionTypeRepository;
+import com.builderssas.api.domain.port.out.constructiontype.ConstructionTypeRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class UpdateConstructionTypeService implements UpdateConstructionTypeUseCase {
 
-    private final ConstructionTypeRepository repository;
+    private final ConstructionTypeRepositoryPort repository;
 
     @Override
     public Mono<ConstructionTypeRecord> update(Long id, ConstructionTypeRecord command) {

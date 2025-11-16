@@ -4,71 +4,136 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
+/**
+ * Entidad persistente que representa una solicitud de construcción.
+ *
+ * Esta clase pertenece a la capa de Infraestructura dentro de la Arquitectura Hexagonal.
+ * Es inmutable para garantizar consistencia y evitar programación imperativa en adapters.
+ *
+ * Características:
+ *  - Constructor vacío requerido por R2DBC.
+ *  - Constructor completo utilizado desde la capa de aplicación.
+ *  - Campos finales para evitar mutaciones.
+ */
 @Table("construction_requests")
 public class ConstructionRequestEntity {
 
     @Id
-    private Long id;
+    @Column("id")
+    private final Long id;
 
     @Column("project_id")
-    private Long projectId;
+    private final Long projectId;
 
     @Column("construction_type_id")
-    private Long constructionTypeId;
+    private final Long constructionTypeId;
 
-    private Double latitude;
+    @Column("latitude")
+    private final Double latitude;
 
-    private Double longitude;
+    @Column("longitude")
+    private final Double longitude;
 
     @Column("requested_by_user_id")
-    private Long requestedByUserId;
+    private final Long requestedByUserId;
 
     @Column("request_date")
-    private LocalDate requestDate;
+    private final LocalDateTime requestDate;
 
     @Column("request_status")
-    private String requestStatus;
+    private final String requestStatus;
 
-    private String observations;
+    @Column("observations")
+    private final String observations;
 
-    /**
-     * Campo adicional para eliminación lógica o futuros flags.
-     */
-    private boolean active;
+    @Column("active")
+    private final Boolean active;
 
-    // -------------------
-    // GETTERS & SETTERS
-    // -------------------
+    // ---------------------------------------------------------
+    // Constructor vacío requerido por R2DBC
+    // ---------------------------------------------------------
+    public ConstructionRequestEntity() {
+        this.id = null;
+        this.projectId = null;
+        this.constructionTypeId = null;
+        this.latitude = null;
+        this.longitude = null;
+        this.requestedByUserId = null;
+        this.requestDate = null;
+        this.requestStatus = null;
+        this.observations = null;
+        this.active = null;
+    }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    // ---------------------------------------------------------
+    // Constructor completo (uso recomendado en Adapter)
+    // ---------------------------------------------------------
+    public ConstructionRequestEntity(
+            Long id,
+            Long projectId,
+            Long constructionTypeId,
+            Double latitude,
+            Double longitude,
+            Long requestedByUserId,
+            LocalDateTime requestDate,
+            String requestStatus,
+            String observations,
+            Boolean active
+    ) {
+        this.id = id;
+        this.projectId = projectId;
+        this.constructionTypeId = constructionTypeId;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.requestedByUserId = requestedByUserId;
+        this.requestDate = requestDate;
+        this.requestStatus = requestStatus;
+        this.observations = observations;
+        this.active = active;
+    }
 
-    public Long getProjectId() { return projectId; }
-    public void setProjectId(Long projectId) { this.projectId = projectId; }
+    // ---------------------------------------------------------
+    // Getters
+    // ---------------------------------------------------------
+    public Long getId() {
+        return id;
+    }
 
-    public Long getConstructionTypeId() { return constructionTypeId; }
-    public void setConstructionTypeId(Long constructionTypeId) { this.constructionTypeId = constructionTypeId; }
+    public Long getProjectId() {
+        return projectId;
+    }
 
-    public Double getLatitude() { return latitude; }
-    public void setLatitude(Double latitude) { this.latitude = latitude; }
+    public Long getConstructionTypeId() {
+        return constructionTypeId;
+    }
 
-    public Double getLongitude() { return longitude; }
-    public void setLongitude(Double longitude) { this.longitude = longitude; }
+    public Double getLatitude() {
+        return latitude;
+    }
 
-    public Long getRequestedByUserId() { return requestedByUserId; }
-    public void setRequestedByUserId(Long requestedByUserId) { this.requestedByUserId = requestedByUserId; }
+    public Double getLongitude() {
+        return longitude;
+    }
 
-    public LocalDate getRequestDate() { return requestDate; }
-    public void setRequestDate(LocalDate requestDate) { this.requestDate = requestDate; }
+    public Long getRequestedByUserId() {
+        return requestedByUserId;
+    }
 
-    public String getRequestStatus() { return requestStatus; }
-    public void setRequestStatus(String requestStatus) { this.requestStatus = requestStatus; }
+    public LocalDateTime getRequestDate() {
+        return requestDate;
+    }
 
-    public String getObservations() { return observations; }
-    public void setObservations(String observations) { this.observations = observations; }
+    public String getRequestStatus() {
+        return requestStatus;
+    }
 
-    public boolean isActive() { return active; }
-    public void setActive(boolean active) { this.active = active; }
+    public String getObservations() {
+        return observations;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
 }

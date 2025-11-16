@@ -1,8 +1,8 @@
 package com.builderssas.api.application.usecase.materialtype;
 
-import com.builderssas.api.domain.model.material.MaterialTypeRecord;
+import com.builderssas.api.domain.model.materialtype.MaterialTypeRecord;
 import com.builderssas.api.domain.port.in.materialtype.ListMaterialTypesUseCase;
-import com.builderssas.api.domain.port.out.MaterialTypeRepository;
+import com.builderssas.api.domain.port.out.materialtype.MaterialTypeRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -11,7 +11,7 @@ import reactor.core.publisher.Flux;
 @RequiredArgsConstructor
 public class ListMaterialTypesService implements ListMaterialTypesUseCase {
 
-    private final MaterialTypeRepository repository;
+    private final MaterialTypeRepositoryPort repository;
 
     @Override
     public Flux<MaterialTypeRecord> listAll() {

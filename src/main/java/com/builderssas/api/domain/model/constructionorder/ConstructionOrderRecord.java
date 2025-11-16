@@ -6,27 +6,55 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * Representa una orden de construcción en el dominio.
- * Es un modelo inmutable cuya estructura coincide 1:1 con la entity
- * utilizada en la capa de persistencia R2DBC. Esta alineación directa
- * evita inconsistencias, facilita el mapeo y asegura que no existan
- * pérdidas de información entre capas.
+ * Record de dominio que representa una Orden de Construcción.
+ *
+ * Este objeto forma parte del Modelo de Dominio bajo la Arquitectura
+ * Hexagonal y se utiliza para transportar datos de manera **inmutable**
+ * entre las capas de aplicación y persistencia.
+ *
+ * Características clave:
+ *  • Forma 1:1 con la entity R2DBC correspondiente.
+ *  • No contiene lógica de negocio.
+ *  • Garantiza integridad y trazabilidad de los valores asociados
+ *    a la orden.
+ *
+ * Atributos:
+ *  • id                      - Identificador único de la orden.
+ *  • constructionRequestId   - ID de la solicitud que origina la orden.
+ *  • projectId               - Proyecto al cual pertenece la orden.
+ *  • constructionTypeId      - Tipo de construcción aplicada.
+ *  • requestedByUserId       - Usuario que hizo la solicitud original.
+ *  • latitude / longitude    - Coordenadas de ejecución.
+ *  • requestedDate           - Fecha en que fue realizada la solicitud.
+ *  • scheduledStartDate      - Fecha programada de inicio de la obra.
+ *  • scheduledEndDate        - Fecha programada de finalización.
+ *  • orderStatus             - Estado operacional de la orden.
+ *  • createdAt               - Fecha/hora de creación del registro.
+ *  • updatedAt               - Fecha/hora de última actualización.
+ *  • observations            - Información o notas relevantes del sistema.
+ *  • active                  - Indicador booleano de disponibilidad.
+ *
+ * Este record se usa ampliamente para:
+ *  • Casos de uso reactivos (WebFlux)
+ *  • Persistencia R2DBC
+ *  • Mapeos limpios entre capas
+ *  • Auditoría y consultas empresariales
  */
 public record ConstructionOrderRecord(
 
-        Long id,                        // Identificador único de la orden
-        Long constructionRequestId,     // ID de la solicitud de construcción asociada
-        Long projectId,                 // Proyecto al que pertenece la orden
-        Long constructionTypeId,        // Tipo de construcción
-        Long requestedByUserId,         // Usuario que creó la solicitud original
-        Double latitude,                // Coordenada latitud
-        Double longitude,               // Coordenada longitud
-        LocalDate requestedDate,        // Fecha en que fue solicitada originalmente
-        LocalDate scheduledStartDate,   // Fecha programada de inicio
-        LocalDate scheduledEndDate,     // Fecha programada de finalización
-        OrderStatus orderStatus,        // Estado actual de la orden
-        LocalDateTime createdAt,        // Fecha y hora de creación de la orden
-        LocalDateTime updatedAt,        // Fecha y hora de última actualización
-        String observations,            // Observaciones asociadas
-        Boolean active                  // Indicador lógico de actividad
+        Long id,
+        Long constructionRequestId,
+        Long projectId,
+        Long constructionTypeId,
+        Long requestedByUserId,
+        Double latitude,
+        Double longitude,
+        LocalDate requestedDate,
+        LocalDate scheduledStartDate,
+        LocalDate scheduledEndDate,
+        OrderStatus orderStatus,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt,
+        String observations,
+        Boolean active
 ) {}

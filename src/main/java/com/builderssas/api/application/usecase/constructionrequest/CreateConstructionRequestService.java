@@ -2,7 +2,7 @@ package com.builderssas.api.application.usecase.constructionrequest;
 
 import com.builderssas.api.domain.model.constructionrequest.ConstructionRequestRecord;
 import com.builderssas.api.domain.port.in.constructionrequest.CreateConstructionRequestUseCase;
-import com.builderssas.api.domain.port.out.ConstructionRequestRepository;
+import com.builderssas.api.domain.port.out.constructionrequest.ConstructionRequestRepositoryPort;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,7 +32,7 @@ public class CreateConstructionRequestService implements CreateConstructionReque
      * construcción. Su implementación concreta se encuentra en la
      * infraestructura mediante un adaptador R2DBC.
      */
-    private final ConstructionRequestRepository repository;
+    private final ConstructionRequestRepositoryPort repository;
 
     /**
      * Persiste una nueva solicitud de construcción.

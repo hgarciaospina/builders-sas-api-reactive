@@ -2,7 +2,7 @@ package com.builderssas.api.application.usecase.constructionrequest;
 
 import com.builderssas.api.domain.model.constructionrequest.ConstructionRequestRecord;
 import com.builderssas.api.domain.port.in.constructionrequest.ListConstructionRequestsUseCase;
-import com.builderssas.api.domain.port.out.ConstructionRequestRepository;
+import com.builderssas.api.domain.port.out.constructionrequest.ConstructionRequestRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -11,7 +11,7 @@ import reactor.core.publisher.Flux;
 @RequiredArgsConstructor
 public class ListConstructionRequestsService implements ListConstructionRequestsUseCase {
 
-    private final ConstructionRequestRepository repository;
+    private final ConstructionRequestRepositoryPort repository;
 
     @Override
     public Flux<ConstructionRequestRecord> listAll() {
