@@ -1,4 +1,4 @@
-package com.builderssas.api.infrastructure.web.controller;
+package com.builderssas.api.infrastructure.web.controller.role;
 
 import com.builderssas.api.domain.model.role.RoleRecord;
 import com.builderssas.api.domain.port.in.role.CreateRoleUseCase;

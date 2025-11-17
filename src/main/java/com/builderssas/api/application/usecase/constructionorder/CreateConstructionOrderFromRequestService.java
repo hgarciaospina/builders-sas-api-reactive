@@ -1,6 +1,6 @@
 package com.builderssas.api.application.usecase.constructionorder;
 
-import com.builderssas.api.domain.model.construction.ConstructionTypeRecord;
+import com.builderssas.api.domain.model.constructiontype.ConstructionTypeRecord;
 import com.builderssas.api.domain.model.constructionorder.ConstructionOrderRecord;
 import com.builderssas.api.domain.model.constructionrequest.ConstructionRequestRecord;
 import com.builderssas.api.domain.model.enums.OrderStatus;

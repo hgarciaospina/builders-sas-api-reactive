@@ -5,19 +5,24 @@ import com.builderssas.api.domain.model.enums.RequestStatus;
 import com.builderssas.api.infrastructure.persistence.entity.ConstructionRequestEntity;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
- * Mapper funcional y 100% declarativo entre:
- * - ConstructionRequestEntity (infraestructura)
- * - ConstructionRequestRecord (dominio)
+ * Mapper funcional para convertir entre:
+ *  - ConstructionRequestEntity (infraestructura)
+ *  - ConstructionRequestRecord (dominio)
  *
- * No utiliza programación imperativa, if/else ni operadores ternarios.
+ * 100% inmutable, sin programación imperativa
+ * y completamente alineado a los tipos reales del dominio y la tabla.
  */
 @Component
 public class ConstructionRequestMapper {
 
+    /**
+     * Convierte una entity de infraestructura a un record de dominio.
+     */
     public ConstructionRequestRecord toRecord(ConstructionRequestEntity e) {
         return new ConstructionRequestRecord(
                 e.getId(),
@@ -33,6 +38,9 @@ public class ConstructionRequestMapper {
         );
     }
 
+    /**
+     * Convierte un record de dominio a una entity inmutable.
+     */
     public ConstructionRequestEntity toEntity(ConstructionRequestRecord r) {
         return new ConstructionRequestEntity(
                 r.id(),
@@ -48,7 +56,7 @@ public class ConstructionRequestMapper {
         );
     }
 
-    // --------- Conversión funcional sin ternarios ni if ----------
+    // -------------------- Conversión funcional pura --------------------
 
     private RequestStatus mapToEnum(String value) {
         return Optional.ofNullable(value)
@@ -62,15 +70,15 @@ public class ConstructionRequestMapper {
                 .orElse(null);
     }
 
-    private java.time.LocalDate mapToLocalDate(LocalDateTime dt) {
+    private LocalDate mapToLocalDate(LocalDateTime dt) {
         return Optional.ofNullable(dt)
                 .map(LocalDateTime::toLocalDate)
                 .orElse(null);
     }
 
-    private LocalDateTime mapToLocalDateTime(java.time.LocalDate date) {
+    private LocalDateTime mapToLocalDateTime(LocalDate date) {
         return Optional.ofNullable(date)
-                .map(d -> d.atStartOfDay())
+                .map(LocalDate::atStartOfDay)
                 .orElse(null);
     }
 }

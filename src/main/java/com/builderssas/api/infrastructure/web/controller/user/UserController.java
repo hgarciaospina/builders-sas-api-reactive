@@ -1,4 +1,4 @@
-package com.builderssas.api.infrastructure.web.controller;
+package com.builderssas.api.infrastructure.web.controller.user;
 
 import com.builderssas.api.domain.model.user.UserRecord;
 import com.builderssas.api.domain.port.in.user.CreateUserUseCase;

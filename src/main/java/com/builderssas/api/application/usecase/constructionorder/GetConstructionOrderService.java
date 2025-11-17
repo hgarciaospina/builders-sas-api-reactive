@@ -13,14 +13,9 @@ import reactor.core.publisher.Mono;
 public class GetConstructionOrderService implements GetConstructionOrderUseCase {
 
     private final ConstructionOrderRepositoryPort repository;
-
     @Override
     public Mono<ConstructionOrderRecord> findById(Long id) {
         return repository.findById(id);
     }
 
-    @Override
-    public Flux<ConstructionOrderRecord> findAll() {
-        return repository.findAll();
-    }
 }

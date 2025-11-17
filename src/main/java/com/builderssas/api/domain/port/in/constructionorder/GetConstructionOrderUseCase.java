@@ -5,8 +5,5 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface GetConstructionOrderUseCase {
-
     Mono<ConstructionOrderRecord> findById(Long id);
-
-    Flux<ConstructionOrderRecord> findAll();
 }

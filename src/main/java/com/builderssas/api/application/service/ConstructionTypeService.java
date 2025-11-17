@@ -1,6 +1,6 @@
 package com.builderssas.api.application.service;
 
-import com.builderssas.api.domain.model.construction.ConstructionTypeRecord;
+import com.builderssas.api.domain.model.constructiontype.ConstructionTypeRecord;
 import com.builderssas.api.domain.port.out.constructiontype.ConstructionTypeRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

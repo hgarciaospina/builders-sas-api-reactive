@@ -4,6 +4,5 @@ import com.builderssas.api.domain.model.constructionorder.ConstructionOrderRecor
 import reactor.core.publisher.Flux;
 
 public interface ListConstructionOrdersUseCase {
-
     Flux<ConstructionOrderRecord> listAll();
 }

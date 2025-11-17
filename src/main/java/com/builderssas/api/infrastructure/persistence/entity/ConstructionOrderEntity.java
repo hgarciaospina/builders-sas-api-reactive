@@ -9,88 +9,107 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * Entidad persistente que representa una orden de construcción.
+ * Entidad persistente inmutable que representa una orden de construcción.
  *
- * Su misión es mapear directamente la tabla "construction_orders"
- * dentro de la base de datos utilizando R2DBC.
+ * Esta clase es usada únicamente por la capa de infraestructura
+ * para mapear la tabla "construction_orders" mediante R2DBC.
  *
- * No contiene lógica de negocio. Es un contenedor de datos para
- * la capa de infraestructura y las operaciones reactivas.
+ * Características:
+ *  - 100% inmutable.
+ *  - Sin setters.
+ *  - Atributos finales.
+ *  - Dos constructores:
+ *      • Constructor vacío requerido por R2DBC.
+ *      • Constructor completo utilizado por mappers funcionales.
+ *
+ *  - No contiene lógica de negocio.
  */
 @Table("construction_orders")
 public class ConstructionOrderEntity {
 
-    /** Identificador único de la orden. */
+    // ============================================================================================
+    // ATRIBUTOS INMUTABLES
+    // ============================================================================================
+
     @Id
     @Column("id")
-    private Long id;
+    private final Long id;
 
-    /** ID de la solicitud de construcción asociada. */
     @Column("construction_request_id")
-    private Long constructionRequestId;
+    private final Long constructionRequestId;
 
-    /** ID del proyecto al que pertenece esta orden. */
     @Column("project_id")
-    private Long projectId;
+    private final Long projectId;
 
-    /** ID del tipo de construcción utilizado. */
     @Column("construction_type_id")
-    private Long constructionTypeId;
+    private final Long constructionTypeId;
 
-    /** ID del usuario que solicitó originalmente esta orden. */
     @Column("requested_by_user_id")
-    private Long requestedByUserId;
+    private final Long requestedByUserId;
 
-    /** Latitud de la ubicación de la construcción. */
     @Column("latitude")
-    private Double latitude;
+    private final Double latitude;
 
-    /** Longitud de la ubicación de la construcción. */
     @Column("longitude")
-    private Double longitude;
+    private final Double longitude;
 
-    /** Fecha en que se creó la solicitud original. */
     @Column("requested_date")
-    private LocalDate requestedDate;
+    private final LocalDate requestedDate;
 
-    /** Fecha programada para el inicio de la construcción. */
     @Column("scheduled_start_date")
-    private LocalDate scheduledStartDate;
+    private final LocalDate scheduledStartDate;
 
-    /** Fecha programada de finalización. */
     @Column("scheduled_end_date")
-    private LocalDate scheduledEndDate;
+    private final LocalDate scheduledEndDate;
 
-    /** Estado actual de la orden. */
     @Column("order_status")
-    private OrderStatus orderStatus;
+    private final OrderStatus orderStatus;
 
-    /** Fecha de creación del registro. */
     @Column("created_at")
-    private LocalDateTime createdAt;
+    private final LocalDateTime createdAt;
 
-    /** Fecha de última actualización del registro. */
     @Column("updated_at")
-    private LocalDateTime updatedAt;
+    private final LocalDateTime updatedAt;
 
-    /** Observaciones generadas por el sistema (consumos, cálculos, etc). */
     @Column("observations")
-    private String observations;
+    private final String observations;
 
-    /** Indicador de si la orden está activa. */
     @Column("active")
-    private Boolean active;
+    private final Boolean active;
 
     // ============================================================================================
-    // CONSTRUCTORES
+    // CONSTRUCTOR VACÍO REQUERIDO POR R2DBC
     // ============================================================================================
-
-    /** Constructor vacío requerido por R2DBC. */
-    public ConstructionOrderEntity() {}
 
     /**
-     * Constructor completo utilizado por mappers funcionales.
+     * Constructor sin argumentos requerido por Spring R2DBC para
+     * instanciar objetos mediante reflexión.
+     *
+     * Los campos se inicializan como null para luego ser poblados
+     * automáticamente por el framework.
      */
+    public ConstructionOrderEntity() {
+        this.id = null;
+        this.constructionRequestId = null;
+        this.projectId = null;
+        this.constructionTypeId = null;
+        this.requestedByUserId = null;
+        this.latitude = null;
+        this.longitude = null;
+        this.requestedDate = null;
+        this.scheduledStartDate = null;
+        this.scheduledEndDate = null;
+        this.orderStatus = null;
+        this.createdAt = null;
+        this.updatedAt = null;
+        this.observations = null;
+        this.active = null;
+    }
+
+    // ============================================================================================
+    // CONSTRUCTOR COMPLETO INMUTABLE
+    // ============================================================================================
+
     public ConstructionOrderEntity(
             Long id,
             Long constructionRequestId,
@@ -126,51 +145,36 @@ public class ConstructionOrderEntity {
     }
 
     // ============================================================================================
-    // GETTERS & SETTERS
+    // GETTERS (SIN SETTERS)
     // ============================================================================================
 
     public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
 
     public Long getConstructionRequestId() { return constructionRequestId; }
-    public void setConstructionRequestId(Long constructionRequestId) { this.constructionRequestId = constructionRequestId; }
 
     public Long getProjectId() { return projectId; }
-    public void setProjectId(Long projectId) { this.projectId = projectId; }
 
     public Long getConstructionTypeId() { return constructionTypeId; }
-    public void setConstructionTypeId(Long constructionTypeId) { this.constructionTypeId = constructionTypeId; }
 
     public Long getRequestedByUserId() { return requestedByUserId; }
-    public void setRequestedByUserId(Long requestedByUserId) { this.requestedByUserId = requestedByUserId; }
 
     public Double getLatitude() { return latitude; }
-    public void setLatitude(Double latitude) { this.latitude = latitude; }
 
     public Double getLongitude() { return longitude; }
-    public void setLongitude(Double longitude) { this.longitude = longitude; }
 
     public LocalDate getRequestedDate() { return requestedDate; }
-    public void setRequestedDate(LocalDate requestedDate) { this.requestedDate = requestedDate; }
 
     public LocalDate getScheduledStartDate() { return scheduledStartDate; }
-    public void setScheduledStartDate(LocalDate scheduledStartDate) { this.scheduledStartDate = scheduledStartDate; }
 
     public LocalDate getScheduledEndDate() { return scheduledEndDate; }
-    public void setScheduledEndDate(LocalDate scheduledEndDate) { this.scheduledEndDate = scheduledEndDate; }
 
     public OrderStatus getOrderStatus() { return orderStatus; }
-    public void setOrderStatus(OrderStatus orderStatus) { this.orderStatus = orderStatus; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 
     public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 
     public String getObservations() { return observations; }
-    public void setObservations(String observations) { this.observations = observations; }
 
     public Boolean getActive() { return active; }
-    public void setActive(Boolean active) { this.active = active; }
 }

@@ -1,4 +1,4 @@
-package com.builderssas.api.domain.model.construction;
+package com.builderssas.api.domain.model.constructiontype;
 
 /**
  * Record de dominio que representa un Tipo de Construcción.

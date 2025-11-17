@@ -4,11 +4,12 @@ import com.builderssas.api.domain.model.enums.RequestStatus;
 import java.time.LocalDate;
 
 /**
- * DTO utilizado para exponer información de una solicitud de construcción.
+ * DTO utilizado para exponer la información de una ConstructionRequest hacia
+ * la capa web.
  *
- * Mantiene una correspondencia exacta 1:1 con el record ConstructionRequestRecord,
- * tanto en nombres como en orden de los atributos. Esto garantiza consistencia
- * entre capas, facilita el mapeo y elimina errores derivados de discrepancias.
+ * Este objeto refleja el estado final procesado dentro de la aplicación, sin
+ * incorporar lógica adicional. Únicamente transporta los datos provenientes del
+ * modelo del dominio hacia consumidores externos.
  */
 public record ConstructionRequestResponseDto(
 
@@ -21,6 +22,6 @@ public record ConstructionRequestResponseDto(
         LocalDate requestDate,
         RequestStatus requestStatus,
         String observations,
-        boolean active
+        Boolean active
 
 ) {}

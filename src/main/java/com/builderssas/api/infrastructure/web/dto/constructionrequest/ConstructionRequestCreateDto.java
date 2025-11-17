@@ -6,17 +6,14 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 /**
- * DTO utilizado para recibir una solicitud de creación de ConstructionRequest.
- * Contiene validaciones estrictas para evitar datos inconsistentes antes de
- * ingresar al dominio, garantizando que únicamente se procese información válida.
+ * DTO utilizado para recibir los datos necesarios para la creación de una
+ * ConstructionRequest desde la capa web.
  *
- * Las validaciones aplicadas aseguran:
- * - Identificadores válidos (projectId, constructionTypeId)
- * - Coordenadas geográficas dentro de los rangos permitidos por el sistema
+ * Incluye validaciones destinadas a asegurar que los valores proporcionados
+ * cumplan con los requisitos mínimos antes de ser enviados al dominio.
  *
- * Este DTO corresponde únicamente a la entrada de datos desde la capa web, y
- * no expone campos generados automáticamente por el sistema (status, requestDate,
- * observations, active, etc.).
+ * Este DTO representa únicamente los datos de entrada proporcionados por el
+ * cliente y no expone valores generados automáticamente por el sistema.
  */
 public record ConstructionRequestCreateDto(
 

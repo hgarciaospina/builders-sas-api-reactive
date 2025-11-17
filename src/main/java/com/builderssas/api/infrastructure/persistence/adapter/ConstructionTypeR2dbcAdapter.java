@@ -1,6 +1,6 @@
 package com.builderssas.api.infrastructure.persistence.adapter;
 
-import com.builderssas.api.domain.model.construction.ConstructionTypeRecord;
+import com.builderssas.api.domain.model.constructiontype.ConstructionTypeRecord;
 import com.builderssas.api.domain.port.out.constructiontype.ConstructionTypeRepositoryPort;
 import com.builderssas.api.infrastructure.persistence.entity.ConstructionTypeEntity;
 import com.builderssas.api.infrastructure.persistence.repository.ConstructionTypeR2dbcRepository;

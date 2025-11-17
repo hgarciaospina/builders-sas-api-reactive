@@ -1,4 +1,4 @@
-package com.builderssas.api.infrastructure.web.controller;
+package com.builderssas.api.infrastructure.web.controller.project;
 
 import com.builderssas.api.domain.model.project.ProjectRecord;
 import com.builderssas.api.domain.port.in.project.CreateProjectUseCase;

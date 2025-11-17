@@ -1,6 +1,6 @@
-package com.builderssas.api.infrastructure.web.controller;
+package com.builderssas.api.infrastructure.web.controller.constructiontype;
 
-import com.builderssas.api.domain.model.construction.ConstructionTypeRecord;
+import com.builderssas.api.domain.model.constructiontype.ConstructionTypeRecord;
 import com.builderssas.api.domain.port.in.constructiontype.CreateConstructionTypeUseCase;
 import com.builderssas.api.domain.port.in.constructiontype.UpdateConstructionTypeUseCase;
 import com.builderssas.api.domain.port.in.constructiontype.GetConstructionTypeUseCase;

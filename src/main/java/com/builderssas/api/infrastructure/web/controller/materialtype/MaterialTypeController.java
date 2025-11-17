@@ -1,4 +1,4 @@
-package com.builderssas.api.infrastructure.web.controller;
+package com.builderssas.api.infrastructure.web.controller.materialtype;
 
 import com.builderssas.api.domain.model.materialtype.MaterialTypeRecord;
 import com.builderssas.api.domain.port.in.materialtype.CreateMaterialTypeUseCase;
