@@ -23,7 +23,7 @@ import reactor.core.publisher.Mono;
  * Hexagonal estricta y el modelo reactivo no bloqueante.
  */
 @RestController
-@RequestMapping("/api/construction-requests")
+@RequestMapping("/api/v1/construction-requests")
 public class ConstructionRequestController {
 
     private final CreateConstructionRequestUseCase createUseCase;

@@ -1,6 +1,7 @@
 package com.builderssas.api.infrastructure.persistence.entity;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -68,8 +69,9 @@ public class ConstructionRequestEntity {
     }
 
     // ---------------------------------------------------------
-    // Constructor completo (uso recomendado en Adapter)
+    // Constructor completo (constructor de persistencia)
     // ---------------------------------------------------------
+    @PersistenceCreator
     public ConstructionRequestEntity(
             Long id,
             Long projectId,
