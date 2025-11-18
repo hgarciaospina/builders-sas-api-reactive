@@ -1,76 +1,67 @@
 package com.builderssas.api.infrastructure.persistence.entity;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * Entidad persistente que representa un tipo de construcción.
  *
- * Esta clase forma parte de la capa de infraestructura y su única
- * responsabilidad es reflejar la estructura de la tabla en la base de datos.
- *
- * No incluye lógica de negocio; dicha lógica reside en el dominio.
+ * Estándar oficial del proyecto:
+ *  • 100% inmutable
+ *  • Todos los campos final
+ *  • Constructor vacío requerido por R2DBC
+ *  • Constructor completo con @PersistenceCreator
+ *  • Cero setters
+ *  • Sin lógica de negocio
  */
 @Table("construction_types")
 public class ConstructionTypeEntity {
 
-    /** Identificador único del tipo de construcción. */
     @Id
     @Column("id")
-    private Long id;
+    private final Long id;
 
-    /** Nombre del tipo de construcción (ej.: vivienda, muro, cerca). */
     @Column("name")
-    private String name;
+    private final String name;
 
-    /**
-     * Duración estimada del proceso en días.
-     * Este atributo suele representar un valor planificado.
-     */
     @Column("estimated_days")
-    private int estimatedDays;
+    private final Integer estimatedDays;
+
+    @Column("active")
+    private final Boolean active;
 
     /**
-     * Indicador de si el tipo de construcción está activo
-     * para ser seleccionado en nuevas solicitudes.
+     * Constructor vacío requerido por Spring R2DBC.
+     * No usar manualmente.
      */
-    @Column("active")
-    private boolean active;
-
-    // ============================================================================================
-    // GETTERS & SETTERS
-    // ============================================================================================
-
-    public Long getId() {
-        return id;
+    public ConstructionTypeEntity() {
+        this.id = null;
+        this.name = null;
+        this.estimatedDays = null;
+        this.active = null;
     }
 
-    public void setId(Long id) {
+    /**
+     * Constructor completo inmutable usado por Spring y los mappers.
+     */
+    @PersistenceCreator
+    public ConstructionTypeEntity(
+            Long id,
+            String name,
+            Integer estimatedDays,
+            Boolean active
+    ) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
         this.name = name;
-    }
-
-    public int getEstimatedDays() {
-        return estimatedDays;
-    }
-
-    public void setEstimatedDays(int estimatedDays) {
         this.estimatedDays = estimatedDays;
-    }
-
-    public boolean isActive() {
-        return active; // nombre correcto para booleanos
-    }
-
-    public void setActive(boolean active) {
         this.active = active;
     }
+
+    // Getters inmutables
+    public Long getId() { return id; }
+    public String getName() { return name; }
+    public Integer getEstimatedDays() { return estimatedDays; }
+    public Boolean getActive() { return active; }
 }

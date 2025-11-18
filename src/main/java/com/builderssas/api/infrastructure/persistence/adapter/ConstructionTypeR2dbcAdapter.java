@@ -3,110 +3,90 @@ package com.builderssas.api.infrastructure.persistence.adapter;
 import com.builderssas.api.domain.model.constructiontype.ConstructionTypeRecord;
 import com.builderssas.api.domain.port.out.constructiontype.ConstructionTypeRepositoryPort;
 import com.builderssas.api.infrastructure.persistence.entity.ConstructionTypeEntity;
+import com.builderssas.api.infrastructure.persistence.mapper.ConstructionTypeMapper;
 import com.builderssas.api.infrastructure.persistence.repository.ConstructionTypeR2dbcRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Optional;
-
 /**
- * Adaptador R2DBC para la entidad ConstructionType.
+ * Adaptador R2DBC que implementa el puerto de salida para tipos de construcción.
  *
- * Pertenece a la capa de infraestructura dentro de la Arquitectura Hexagonal.
- * Su única responsabilidad es traducir entre:
- *
- *   • Entity (infraestructura)
- *   • Record del dominio (modelo puro)
- *
- * y delegar las operaciones reactivas al repositorio R2DBC.
- *
- * No contiene ninguna lógica de negocio.
+ * 100% reactivo, sin lógica de negocio y alineado con la Arquitectura Hexagonal.
+ * Se encarga únicamente de:
+ *  - Invocar el repositorio R2DBC.
+ *  - Convertir entre Entity (infraestructura) y Record (dominio).
  */
 @Component
 @RequiredArgsConstructor
 public class ConstructionTypeR2dbcAdapter implements ConstructionTypeRepositoryPort {
 
-    /** Repositorio R2DBC real que accede a la base de datos. */
     private final ConstructionTypeR2dbcRepository repository;
-
-    // ============================================================================
-    // MAPPERS — Functional Style (0% imperativa)
-    // ============================================================================
+    private final ConstructionTypeMapper mapper;
 
     /**
-     * Convierte una entity en su record de dominio equivalente.
+     * Busca un tipo de construcción por su identificador.
      *
-     * @param e entity de infraestructura
-     * @return record del dominio o null
-     */
-    private ConstructionTypeRecord toDomain(ConstructionTypeEntity e) {
-        return Optional.ofNullable(e)
-                .map(x -> new ConstructionTypeRecord(
-                        x.getId(),
-                        x.getName(),
-                        x.getEstimatedDays(),
-                        x.isActive()
-                ))
-                .orElse(null);
-    }
-
-    /**
-     * Convierte un record del dominio en una entity lista para persistencia.
-     *
-     * @param d record del dominio
-     * @return entity persistible o null
-     */
-    private ConstructionTypeEntity toEntity(ConstructionTypeRecord d) {
-        return Optional.ofNullable(d)
-                .map(x -> {
-                    ConstructionTypeEntity e = new ConstructionTypeEntity();
-                    e.setId(x.id());
-                    e.setName(x.name());
-                    e.setEstimatedDays(x.estimatedDays());
-                    e.setActive(x.active());
-                    return e;
-                })
-                .orElse(null);
-    }
-
-    // ============================================================================
-    // CRUD REACTIVO — Implementación del Puerto
-    // ============================================================================
-
-    /**
-     * Busca un tipo de construcción por ID.
-     *
-     * @param id identificador
-     * @return Mono con el record del dominio
+     * El filtrado por activos se hace en el caso de uso.
      */
     @Override
     public Mono<ConstructionTypeRecord> findById(Long id) {
         return repository.findById(id)
-                .map(this::toDomain);
+                .map(mapper::toRecord);
     }
 
     /**
-     * Obtiene todos los tipos de construcción disponibles.
-     *
-     * @return Flux con el catálogo
+     * Lista todos los tipos de construcción, activos e inactivos.
      */
     @Override
     public Flux<ConstructionTypeRecord> findAll() {
         return repository.findAll()
-                .map(this::toDomain);
+                .map(mapper::toRecord);
     }
 
     /**
-     * Guarda o actualiza un tipo de construcción.
+     * Lista únicamente los tipos de construcción activos.
+     */
+    @Override
+    public Flux<ConstructionTypeRecord> findAllActive() {
+        return repository.findAll()
+                .filter(entity -> Boolean.TRUE.equals(entity.getActive()))
+                .map(mapper::toRecord);
+    }
+
+    /**
+     * Persiste un tipo de construcción.
      *
-     * @param aggregate record del dominio
-     * @return Mono con el record persistido
+     * Si el id es null, se crea un nuevo registro.
+     * Si el id tiene valor, se actualiza el existente.
      */
     @Override
     public Mono<ConstructionTypeRecord> save(ConstructionTypeRecord aggregate) {
-        return repository.save(toEntity(aggregate))
-                .map(this::toDomain);
+        return Mono.just(aggregate)
+                .map(mapper::toEntity)
+                .flatMap(repository::save)
+                .map(mapper::toRecord);
+    }
+
+    /**
+     * Aplica borrado lógico (soft delete) para el tipo de construcción.
+     *
+     * No elimina físicamente el registro; crea una nueva instancia
+     * inmutable con active = false y la guarda.
+     */
+    @Override
+    public Mono<Void> softDelete(Long id) {
+        return repository.findById(id)
+                .map(entity ->
+                        new ConstructionTypeEntity(
+                                entity.getId(),
+                                entity.getName(),
+                                entity.getEstimatedDays(),
+                                Boolean.FALSE // inactivar sin usar setters
+                        )
+                )
+                .flatMap(repository::save)
+                .then();
     }
 }

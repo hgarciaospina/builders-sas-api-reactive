@@ -1,44 +1,69 @@
 package com.builderssas.api.infrastructure.web.controller.constructiontype;
 
-import com.builderssas.api.domain.model.constructiontype.ConstructionTypeRecord;
-import com.builderssas.api.domain.port.in.constructiontype.CreateConstructionTypeUseCase;
-import com.builderssas.api.domain.port.in.constructiontype.UpdateConstructionTypeUseCase;
-import com.builderssas.api.domain.port.in.constructiontype.GetConstructionTypeUseCase;
-import com.builderssas.api.domain.port.in.constructiontype.ListConstructionTypesUseCase;
+import com.builderssas.api.domain.port.in.constructiontype.*;
+import com.builderssas.api.infrastructure.web.dto.constructiontype.*;
+import com.builderssas.api.infrastructure.web.mapper.ConstructionTypeWebMapper;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/api/v1/constructiontypes")
+@RequestMapping("/api/v1/construction-types")
 @RequiredArgsConstructor
 public class ConstructionTypeController {
 
     private final CreateConstructionTypeUseCase createUseCase;
-    private final UpdateConstructionTypeUseCase updateUseCase;
     private final GetConstructionTypeUseCase getUseCase;
     private final ListConstructionTypesUseCase listUseCase;
-
-    @GetMapping
-    public Flux<ConstructionTypeRecord> list() {
-        return listUseCase.listAll();
-    }
-
-    @GetMapping("/<built-in function id>")
-    public Mono<ConstructionTypeRecord> get(@PathVariable Long id) {
-        return getUseCase.getById(id);
-    }
+    private final ListActiveConstructionTypesUseCase listActiveUseCase;
+    private final UpdateConstructionTypeUseCase updateUseCase;
+    private final DeleteConstructionTypeUseCase deleteUseCase;
+    private final ConstructionTypeWebMapper webMapper;
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public Mono<ConstructionTypeRecord> create(@RequestBody ConstructionTypeRecord body) {
-        return createUseCase.create(body);
+    public Mono<ConstructionTypeResponseDto> create(
+            @Valid @RequestBody ConstructionTypeCreateDto dto
+    ) {
+        return Mono.just(dto)
+                .map(webMapper::toRecord)
+                .flatMap(createUseCase::create)
+                .map(webMapper::toResponse);
     }
 
-    @PutMapping("/<built-in function id>")
-    public Mono<ConstructionTypeRecord> update(@PathVariable Long id, @RequestBody ConstructionTypeRecord body) {
-        return updateUseCase.update(id, body);
+    @GetMapping("/{id}")
+    public Mono<ConstructionTypeResponseDto> getById(@PathVariable Long id) {
+        return getUseCase.getById(id)
+                .map(webMapper::toResponse);
+    }
+
+    @GetMapping
+    public Flux<ConstructionTypeResponseDto> listActive() {
+        return listActiveUseCase.listActive()
+                .map(webMapper::toResponse);
+    }
+
+    @GetMapping("/all")
+    public Flux<ConstructionTypeResponseDto> listAll() {
+        return listUseCase.listAll()
+                .map(webMapper::toResponse);
+    }
+
+    @PutMapping("/{id}")
+    public Mono<ConstructionTypeResponseDto> update(
+            @PathVariable Long id,
+            @Valid @RequestBody ConstructionTypeUpdateDto dto
+    ) {
+        return Mono.just(dto)
+                .map(d -> webMapper.toRecord(id, d))
+                .flatMap(r -> updateUseCase.update(id, r))
+                .map(webMapper::toResponse);
+    }
+
+    @DeleteMapping("/{id}")
+    public Mono<Void> delete(@PathVariable Long id) {
+        return deleteUseCase.delete(id);
     }
 }

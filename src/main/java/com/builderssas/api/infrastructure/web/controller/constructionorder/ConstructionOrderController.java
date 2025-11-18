@@ -67,8 +67,8 @@ public class ConstructionOrderController {
             @RequestBody CreateConstructionOrderRequestDto request
     ) {
         return Mono.just(request)
-                .map(webMapper::toDomain)   // 🔥 DTO → RECORD de dominio
-                .flatMap(createUseCase::create) // 🔥 Use case recibe record
-                .map(webMapper::toResponse);    // 🔥 RECORD → DTO respuesta
+                .map(webMapper::toDomain)   //DTO → RECORD de dominio
+                .flatMap(createUseCase::create) // Use case recibe record
+                .map(webMapper::toResponse);    //  RECORD → DTO respuesta
     }
 }
