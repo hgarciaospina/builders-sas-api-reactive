@@ -33,4 +33,7 @@ public interface ConstructionOrderR2dbcRepository
      * @return orden más reciente o Mono vacío si no existen órdenes
      */
     Mono<ConstructionOrderEntity> findTopByProjectIdOrderByScheduledEndDateDesc(Long projectId);
+
+    Mono<Boolean> existsByLatitudeAndLongitude(Double latitude, Double longitude);
+
 }

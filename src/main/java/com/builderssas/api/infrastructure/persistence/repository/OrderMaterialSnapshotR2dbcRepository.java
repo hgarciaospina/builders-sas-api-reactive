@@ -18,7 +18,7 @@ import reactor.core.publisher.Flux;
  * - dashboards avanzados.
  */
 @Repository
-public interface OrderMaterialSnapshotRepository
+public interface OrderMaterialSnapshotR2dbcRepository
         extends ReactiveCrudRepository<OrderMaterialSnapshotEntity, Long> {
 
     /**

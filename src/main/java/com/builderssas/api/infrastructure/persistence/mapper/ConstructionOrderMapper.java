@@ -5,19 +5,18 @@ import com.builderssas.api.infrastructure.persistence.entity.ConstructionOrderEn
 import org.springframework.stereotype.Component;
 
 /**
- * Mapper funcional e inmutable encargado de convertir entre:
- *  - ConstructionOrderEntity (infraestructura)
- *  - ConstructionOrderRecord (dominio)
+ * Mapper para conversión entre:
+ *  • ConstructionOrderRecord  →  ConstructionOrderEntity
+ *  • ConstructionOrderEntity  →  ConstructionOrderRecord
  *
- * Sin programación imperativa, sin nulls, sin setters.
- * Correspondencia 1:1 con los atributos reales.
+ * 100% inmutable, sin lógica de negocio, sin defaults.
+ * ÚNICAMENTE traslada valores tal cual existen.
  */
 @Component
 public class ConstructionOrderMapper {
 
     /**
-     * Convierte una entity en un record de dominio.
-     * Nunca retorna null.
+     * Convierte una Entity (persistencia) → Record (dominio)
      */
     public ConstructionOrderRecord toRecord(ConstructionOrderEntity e) {
         return new ConstructionOrderRecord(
@@ -28,20 +27,24 @@ public class ConstructionOrderMapper {
                 e.getRequestedByUserId(),
                 e.getLatitude(),
                 e.getLongitude(),
-                e.getRequestedDate(),       // LocalDate
-                e.getScheduledStartDate(),  // LocalDate
-                e.getScheduledEndDate(),    // LocalDate
-                e.getOrderStatus(),         // Enum
-                e.getCreatedAt(),           // LocalDateTime
-                e.getUpdatedAt(),           // LocalDateTime
+                e.getRequestedDate(),
+                e.getScheduledStartDate(),
+                e.getScheduledEndDate(),
+                e.getOrderStatus(),
+                e.getCreatedAt(),
+                e.getUpdatedAt(),
                 e.getObservations(),
                 e.getActive()
         );
     }
 
     /**
-     * Convierte un record de dominio en una entity inmutable.
-     * Nunca retorna null.
+     * Convierte un Record (dominio) → Entity (persistencia)
+     *
+     * NOTA IMPORTANTE:
+     *  • Se respeta EXACTAMENTE lo que viene en el record.
+     *  • Si el record trae createdAt o updatedAt nulo → se guarda nulo.
+     *  • La lógica de timestamps la define el UseCase, no el mapper.
      */
     public ConstructionOrderEntity toEntity(ConstructionOrderRecord r) {
         return new ConstructionOrderEntity(
@@ -52,12 +55,12 @@ public class ConstructionOrderMapper {
                 r.requestedByUserId(),
                 r.latitude(),
                 r.longitude(),
-                r.requestedDate(),          // LocalDate
-                r.scheduledStartDate(),     // LocalDate
-                r.scheduledEndDate(),       // LocalDate
+                r.requestedDate(),
+                r.scheduledStartDate(),
+                r.scheduledEndDate(),
                 r.orderStatus(),
-                r.createdAt(),              // LocalDateTime
-                r.updatedAt(),              // LocalDateTime
+                r.createdAt(),
+                r.updatedAt(),
                 r.observations(),
                 r.active()
         );

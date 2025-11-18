@@ -1,12 +1,11 @@
 package com.builderssas.api.application.usecase.constructionorder;
 
-import com.builderssas.api.domain.model.constructiontype.ConstructionTypeRecord;
 import com.builderssas.api.domain.model.constructionorder.ConstructionOrderRecord;
 import com.builderssas.api.domain.model.constructionrequest.ConstructionRequestRecord;
+import com.builderssas.api.domain.model.constructiontype.ConstructionTypeRecord;
 import com.builderssas.api.domain.model.enums.OrderStatus;
 import com.builderssas.api.domain.port.out.constructionorder.ConstructionOrderRepositoryPort;
 import com.builderssas.api.domain.port.out.constructiontype.ConstructionTypeRepositoryPort;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -15,19 +14,25 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * Caso de uso encargado de crear una orden de construcción desde una solicitud.
+ * Caso de uso encargado de **crear órdenes de construcción a partir
+ * de una solicitud aprobada (ConstructionRequestRecord)**.
  *
- * Reglas exactas del negocio:
+ * Características arquitectónicas:
+ *  • Pertenece a la capa de aplicación (Application Layer).
+ *  • No contiene lógica de infraestructura.
+ *  • NO muta objetos — genera records totalmente inmutables.
+ *  • Calcula:
+ *      - Fecha de inicio programada.
+ *      - Fecha de finalización estimada.
+ *      - Estado inicial de la orden.
+ *      - Fechas de auditoría (createdAt / updatedAt).
  *
- * 1. Si el proyecto NO tiene órdenes previas:
- *      scheduledStartDate = requestDate + 1 día
- *      scheduledEndDate   = scheduledStartDate + estimatedDays + 1 día de entrega
- *
- * 2. Si el proyecto SÍ tiene órdenes previas:
- *      scheduledStartDate = scheduledEndDate última orden + 1 día
- *      scheduledEndDate   = scheduledStartDate + estimatedDays + 1 día de entrega
- *
- * El día adicional al final SIEMPRE corresponde al día de entrega.
+ * Flujo:
+ *  1. Consulta el tipo de construcción para obtener los días estimados.
+ *  2. Obtiene la última orden del proyecto para encadenar fechas.
+ *  3. Calcula startDate y endDate.
+ *  4. Construye un ConstructionOrderRecord inmutable.
+ *  5. Persiste la orden mediante el puerto de repositorio.
  */
 @Service
 @RequiredArgsConstructor
@@ -37,49 +42,60 @@ public class CreateConstructionOrderFromRequestService {
     private final ConstructionTypeRepositoryPort typeRepository;
 
     /**
-     * Genera la orden aplicando las reglas de encadenamiento descritas arriba.
+     * Crea una Orden de Construcción a partir de una solicitud validada.
+     *
+     * @param request ConstructionRequestRecord aprobado
+     * @return Mono<ConstructionOrderRecord> orden persistida
      */
-    public Mono<ConstructionOrderRecord> createFromRequest(ConstructionRequestRecord req) {
+    public Mono<ConstructionOrderRecord> createFromRequest(ConstructionRequestRecord request) {
 
-        // Obtiene estimatedDays desde el tipo de construcción
+        // 1️⃣ Obtener días estimados desde el tipo de construcción
         Mono<Integer> estimatedDaysMono =
-                typeRepository.findById(req.constructionTypeId())
+                typeRepository.findById(request.constructionTypeId())
                         .map(ConstructionTypeRecord::estimatedDays);
 
-        // Determina scheduledStartDate según haya o no órdenes previas
-        Mono<LocalDate> scheduledStartMono =
-                orderRepository.findLastByProjectId(req.projectId())
-                        .map(lastOrder -> lastOrder.scheduledEndDate().plusDays(1))  // Caso 2
-                        .defaultIfEmpty(req.requestDate().plusDays(1));               // Caso 1
+        // 2️⃣ Calcular fecha de inicio:
+        //    • Si existe una orden previa → el día siguiente a su fin
+        //    • Si no existe → requestDate + 1 día
+        Mono<LocalDate> startDateMono =
+                orderRepository.findLastByProjectId(request.projectId())
+                        .map(last -> last.scheduledEndDate().plusDays(1))
+                        .defaultIfEmpty(request.requestDate().plusDays(1));
 
+        /**
+         * Record interno para evitar getT1() / getT2()
+         * y mantener el código 100% legible.
+         */
+        record OrderCreationData(Integer estimatedDays, LocalDate startDate) {}
+
+        // 3️⃣ Unir cálculos funcionalmente de forma legible
         return estimatedDaysMono
-                .zipWith(scheduledStartMono)
-                .map(tuple -> {
+                .zipWith(startDateMono, OrderCreationData::new)
+                .map(data -> {
 
-                    Integer estimatedDays = tuple.getT1();
-                    LocalDate scheduledStartDate = tuple.getT2();
+                    Integer estimated = data.estimatedDays();
+                    LocalDate start = data.startDate();
+                    LocalDate end = start.plusDays(estimated).plusDays(1);
 
-                    // scheduledEndDate = scheduledStartDate + estimatedDays + 1 día de entrega
-                    LocalDate scheduledEndDate = scheduledStartDate
-                            .plusDays(estimatedDays)
-                            .plusDays(1);
+                    LocalDateTime now = LocalDateTime.now();
 
+                    // 4️⃣ Record inmutable creado correctamente
                     return new ConstructionOrderRecord(
-                            null,
-                            req.id(),
-                            req.projectId(),
-                            req.constructionTypeId(),
-                            req.requestedByUserId(),
-                            req.latitude(),
-                            req.longitude(),
-                            req.requestDate(),
-                            scheduledStartDate,
-                            scheduledEndDate,
-                            OrderStatus.PENDING,
-                            LocalDateTime.now(),
-                            null,
-                            req.observations(),
-                            true
+                            null,                         // id → autogenerado
+                            request.id(),                 // FK solicitud
+                            request.projectId(),
+                            request.constructionTypeId(),
+                            request.requestedByUserId(),
+                            request.latitude(),
+                            request.longitude(),
+                            request.requestDate(),        // requestedDate
+                            start,                        // scheduledStartDate
+                            end,                          // scheduledEndDate
+                            OrderStatus.IN_PROGRESS,      // ✔️ Estado inicial correcto
+                            now,                          // createdAt
+                            now,                          // updatedAt
+                            request.observations(),
+                            true                          // active
                     );
                 })
                 .flatMap(orderRepository::save);

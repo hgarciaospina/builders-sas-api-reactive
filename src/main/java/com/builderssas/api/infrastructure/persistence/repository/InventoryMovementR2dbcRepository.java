@@ -6,7 +6,6 @@ import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
 
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 /**
  * Repositorio R2DBC para la persistencia de movimientos de inventario.
@@ -18,7 +17,7 @@ import reactor.core.publisher.Mono;
  * la lógica de negocio se ejecuta en los casos de uso.
  */
 @Repository
-public interface InventoryMovementRepository
+public interface InventoryMovementR2dbcRepository
         extends ReactiveCrudRepository<InventoryMovementEntity, Long> {
 
     /**

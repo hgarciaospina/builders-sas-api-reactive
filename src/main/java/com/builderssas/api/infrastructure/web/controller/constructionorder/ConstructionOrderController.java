@@ -4,7 +4,8 @@ import com.builderssas.api.domain.port.in.constructionorder.CreateConstructionOr
 import com.builderssas.api.domain.port.in.constructionorder.GetConstructionOrderUseCase;
 import com.builderssas.api.domain.port.in.constructionorder.ListConstructionOrdersUseCase;
 import com.builderssas.api.infrastructure.web.dto.constructionorder.ConstructionOrderResponseDto;
-import com.builderssas.api.infrastructure.web.mapper.constructionorder.ConstructionOrderWebMapper;
+import com.builderssas.api.infrastructure.web.dto.constructionorder.CreateConstructionOrderRequestDto;
+import com.builderssas.api.infrastructure.web.mapper.ConstructionOrderWebMapper;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -18,7 +19,7 @@ import reactor.core.publisher.Mono;
  * No contiene lógica de negocio ni reglas del dominio.
  */
 @RestController
-@RequestMapping("/api/construction-orders")
+@RequestMapping("/api/v1/construction-orders")
 public class ConstructionOrderController {
 
     private final CreateConstructionOrderUseCase createUseCase;
@@ -59,5 +60,15 @@ public class ConstructionOrderController {
     public Flux<ConstructionOrderResponseDto> findAll() {
         return listUseCase.listAll()
                 .map(webMapper::toResponse);
+    }
+
+    @PostMapping
+    public Mono<ConstructionOrderResponseDto> create(
+            @RequestBody CreateConstructionOrderRequestDto request
+    ) {
+        return Mono.just(request)
+                .map(webMapper::toDomain)   // 🔥 DTO → RECORD de dominio
+                .flatMap(createUseCase::create) // 🔥 Use case recibe record
+                .map(webMapper::toResponse);    // 🔥 RECORD → DTO respuesta
     }
 }

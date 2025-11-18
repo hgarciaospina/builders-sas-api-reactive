@@ -57,4 +57,55 @@ public record ConstructionOrderRecord(
         LocalDateTime updatedAt,
         String observations,
         Boolean active
-) {}
+) {
+
+    /**
+     * Crea un nuevo record copiando todos los valores,
+     * excepto el campo updatedAt, que se reemplaza.
+     *
+     * Mantiene la inmutabilidad total y no altera ningún otro dato.
+     */
+    public ConstructionOrderRecord withUpdatedAt(LocalDateTime newUpdatedAt) {
+        return new ConstructionOrderRecord(
+                id,
+                constructionRequestId,
+                projectId,
+                constructionTypeId,
+                requestedByUserId,
+                latitude,
+                longitude,
+                requestedDate,
+                scheduledStartDate,
+                scheduledEndDate,
+                orderStatus,
+                createdAt,
+                newUpdatedAt,
+                observations,
+                active
+        );
+    }
+
+    /**
+     * Crea un nuevo record actualizando únicamente el estado (orderStatus),
+     * conservando el resto de atributos exactamente igual.
+     */
+    public ConstructionOrderRecord withStatus(OrderStatus newStatus) {
+        return new ConstructionOrderRecord(
+                id,
+                constructionRequestId,
+                projectId,
+                constructionTypeId,
+                requestedByUserId,
+                latitude,
+                longitude,
+                requestedDate,
+                scheduledStartDate,
+                scheduledEndDate,
+                newStatus,
+                createdAt,
+                updatedAt,
+                observations,
+                active
+        );
+    }
+}

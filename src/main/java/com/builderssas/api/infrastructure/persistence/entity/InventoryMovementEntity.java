@@ -26,185 +26,141 @@ public class InventoryMovementEntity {
 
     /** Identificador único del movimiento. */
     @Id
-    private Long id;
+    private final Long id;
 
     /** ID del material al que se aplicó el movimiento. */
     @Column("material_id")
-    private Long materialId;
+    private final Long materialId;
 
     /** Nombre del material (congelado). */
     @Column("material_name")
-    private String materialName;
+    private final String materialName;
 
     /** Unidad de medida (congelada). */
     @Column("unit_of_measure")
-    private String unitOfMeasure;
+    private final String unitOfMeasure;
 
     /** Dirección del movimiento (IN/OUT). */
     @Column("movement_type")
-    private InventoryMovementType movementType;
+    private final InventoryMovementType movementType;
 
     /** Cantidad movida (siempre positiva). */
     @Column("quantity")
-    private Double quantity;
+    private final Double quantity;
 
     /** Stock antes del movimiento. */
     @Column("previous_stock")
-    private Double previousStock;
+    private final Double previousStock;
 
     /** Stock después del movimiento. */
     @Column("final_stock")
-    private Double finalStock;
+    private final Double finalStock;
 
     /** Fecha y hora en que ocurrió el movimiento. */
     @Column("movement_date")
-    private LocalDateTime movementDate;
+    private final LocalDateTime movementDate;
 
     /** ID de la orden relacionada (opcional). */
     @Column("order_id")
-    private Long orderId;
+    private final Long orderId;
 
     /** Motivo del movimiento. */
     @Column("reason")
-    private InventoryReason reason;
+    private final InventoryReason reason;
 
     /** Estado del movimiento. */
     @Column("status")
-    private InventoryStatus status;
+    private final InventoryStatus status;
 
     /** ID del usuario responsable del movimiento. */
     @Column("user_id")
-    private Long userId;
+    private final Long userId;
 
     /** Nombre completo del usuario (congelado). */
     @Column("user_full_name")
-    private String userFullName;
+    private final String userFullName;
 
     /** Rol del usuario al momento del movimiento. */
     @Column("user_role")
-    private String userRole;
+    private final String userRole;
 
     // ============================================================================================
-    // GETTERS & SETTERS (Solo infraestructura; dominio sigue siendo inmutable)
+    // CONSTRUCTOR VACÍO REQUERIDO POR R2DBC
     // ============================================================================================
 
-    public Long getId() {
-        return id;
+    public InventoryMovementEntity() {
+        this.id = null;
+        this.materialId = null;
+        this.materialName = null;
+        this.unitOfMeasure = null;
+        this.movementType = null;
+        this.quantity = null;
+        this.previousStock = null;
+        this.finalStock = null;
+        this.movementDate = null;
+        this.orderId = null;
+        this.reason = null;
+        this.status = null;
+        this.userId = null;
+        this.userFullName = null;
+        this.userRole = null;
     }
 
-    public void setId(Long id) {
+    // ============================================================================================
+    // CONSTRUCTOR COMPLETO INMUTABLE
+    // ============================================================================================
+
+    public InventoryMovementEntity(
+            Long id,
+            Long materialId,
+            String materialName,
+            String unitOfMeasure,
+            InventoryMovementType movementType,
+            Double quantity,
+            Double previousStock,
+            Double finalStock,
+            LocalDateTime movementDate,
+            Long orderId,
+            InventoryReason reason,
+            InventoryStatus status,
+            Long userId,
+            String userFullName,
+            String userRole
+    ) {
         this.id = id;
-    }
-
-    public Long getMaterialId() {
-        return materialId;
-    }
-
-    public void setMaterialId(Long materialId) {
         this.materialId = materialId;
-    }
-
-    public String getMaterialName() {
-        return materialName;
-    }
-
-    public void setMaterialName(String materialName) {
         this.materialName = materialName;
-    }
-
-    public String getUnitOfMeasure() {
-        return unitOfMeasure;
-    }
-
-    public void setUnitOfMeasure(String unitOfMeasure) {
         this.unitOfMeasure = unitOfMeasure;
-    }
-
-    public InventoryMovementType getMovementType() {
-        return movementType;
-    }
-
-    public void setMovementType(InventoryMovementType movementType) {
         this.movementType = movementType;
-    }
-
-    public Double getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Double quantity) {
         this.quantity = quantity;
-    }
-
-    public Double getPreviousStock() {
-        return previousStock;
-    }
-
-    public void setPreviousStock(Double previousStock) {
         this.previousStock = previousStock;
-    }
-
-    public Double getFinalStock() {
-        return finalStock;
-    }
-
-    public void setFinalStock(Double finalStock) {
         this.finalStock = finalStock;
-    }
-
-    public LocalDateTime getMovementDate() {
-        return movementDate;
-    }
-
-    public void setMovementDate(LocalDateTime movementDate) {
         this.movementDate = movementDate;
-    }
-
-    public Long getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(Long orderId) {
         this.orderId = orderId;
-    }
-
-    public InventoryReason getReason() {
-        return reason;
-    }
-
-    public void setReason(InventoryReason reason) {
         this.reason = reason;
-    }
-
-    public InventoryStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(InventoryStatus status) {
         this.status = status;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
         this.userId = userId;
-    }
-
-    public String getUserFullName() {
-        return userFullName;
-    }
-
-    public void setUserFullName(String userFullName) {
         this.userFullName = userFullName;
-    }
-
-    public String getUserRole() {
-        return userRole;
-    }
-
-    public void setUserRole(String userRole) {
         this.userRole = userRole;
     }
+
+    // ============================================================================================
+    // GETTERS (SIN SETTERS — INMUTABLE)
+    // ============================================================================================
+
+    public Long getId() { return id; }
+    public Long getMaterialId() { return materialId; }
+    public String getMaterialName() { return materialName; }
+    public String getUnitOfMeasure() { return unitOfMeasure; }
+    public InventoryMovementType getMovementType() { return movementType; }
+    public Double getQuantity() { return quantity; }
+    public Double getPreviousStock() { return previousStock; }
+    public Double getFinalStock() { return finalStock; }
+    public LocalDateTime getMovementDate() { return movementDate; }
+    public Long getOrderId() { return orderId; }
+    public InventoryReason getReason() { return reason; }
+    public InventoryStatus getStatus() { return status; }
+    public Long getUserId() { return userId; }
+    public String getUserFullName() { return userFullName; }
+    public String getUserRole() { return userRole; }
 }

@@ -11,25 +11,14 @@ import java.time.LocalDateTime;
 /**
  * Entidad persistente inmutable que representa una orden de construcción.
  *
- * Esta clase es usada únicamente por la capa de infraestructura
- * para mapear la tabla "construction_orders" mediante R2DBC.
- *
- * Características:
- *  - 100% inmutable.
- *  - Sin setters.
- *  - Atributos finales.
- *  - Dos constructores:
- *      • Constructor vacío requerido por R2DBC.
- *      • Constructor completo utilizado por mappers funcionales.
- *
- *  - No contiene lógica de negocio.
+ * NO CONTIENE lógica.
+ * NO ASIGNA valores por defecto.
+ * NO modifica estados.
+ * NO cambia enums.
+ * Solo representa la fila tal como está en la BD.
  */
 @Table("construction_orders")
 public class ConstructionOrderEntity {
-
-    // ============================================================================================
-    // ATRIBUTOS INMUTABLES
-    // ============================================================================================
 
     @Id
     @Column("id")
@@ -77,39 +66,11 @@ public class ConstructionOrderEntity {
     @Column("active")
     private final Boolean active;
 
-    // ============================================================================================
-    // CONSTRUCTOR VACÍO REQUERIDO POR R2DBC
-    // ============================================================================================
-
     /**
-     * Constructor sin argumentos requerido por Spring R2DBC para
-     * instanciar objetos mediante reflexión.
-     *
-     * Los campos se inicializan como null para luego ser poblados
-     * automáticamente por el framework.
+     * Constructor completo usado por R2DBC para mapear columnas.
+     * NO agrega lógica. NO pone defaults.
+     * R2DBC lo usa gracias a que incluye todos los campos.
      */
-    public ConstructionOrderEntity() {
-        this.id = null;
-        this.constructionRequestId = null;
-        this.projectId = null;
-        this.constructionTypeId = null;
-        this.requestedByUserId = null;
-        this.latitude = null;
-        this.longitude = null;
-        this.requestedDate = null;
-        this.scheduledStartDate = null;
-        this.scheduledEndDate = null;
-        this.orderStatus = null;
-        this.createdAt = null;
-        this.updatedAt = null;
-        this.observations = null;
-        this.active = null;
-    }
-
-    // ============================================================================================
-    // CONSTRUCTOR COMPLETO INMUTABLE
-    // ============================================================================================
-
     public ConstructionOrderEntity(
             Long id,
             Long constructionRequestId,
@@ -144,37 +105,23 @@ public class ConstructionOrderEntity {
         this.active = active;
     }
 
-    // ============================================================================================
-    // GETTERS (SIN SETTERS)
-    // ============================================================================================
+    // ========================================
+    // GETTERS (INMUTABLE — SIN SETTERS)
+    // ========================================
 
     public Long getId() { return id; }
-
     public Long getConstructionRequestId() { return constructionRequestId; }
-
     public Long getProjectId() { return projectId; }
-
     public Long getConstructionTypeId() { return constructionTypeId; }
-
     public Long getRequestedByUserId() { return requestedByUserId; }
-
     public Double getLatitude() { return latitude; }
-
     public Double getLongitude() { return longitude; }
-
     public LocalDate getRequestedDate() { return requestedDate; }
-
     public LocalDate getScheduledStartDate() { return scheduledStartDate; }
-
     public LocalDate getScheduledEndDate() { return scheduledEndDate; }
-
     public OrderStatus getOrderStatus() { return orderStatus; }
-
     public LocalDateTime getCreatedAt() { return createdAt; }
-
     public LocalDateTime getUpdatedAt() { return updatedAt; }
-
     public String getObservations() { return observations; }
-
     public Boolean getActive() { return active; }
 }

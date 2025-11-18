@@ -3,7 +3,7 @@ package com.builderssas.api.infrastructure.persistence.adapter;
 import com.builderssas.api.domain.model.inventory.OrderMaterialSnapshot;
 import com.builderssas.api.domain.port.out.ordermaterialsnapshot.OrderMaterialSnapshotRepositoryPort;
 import com.builderssas.api.infrastructure.persistence.mapper.OrderMaterialSnapshotMapper;
-import com.builderssas.api.infrastructure.persistence.repository.OrderMaterialSnapshotRepository;
+import com.builderssas.api.infrastructure.persistence.repository.OrderMaterialSnapshotR2dbcRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -19,7 +19,7 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class OrderMaterialSnapshotR2dbcAdapter implements OrderMaterialSnapshotRepositoryPort {
 
-    private final OrderMaterialSnapshotRepository repository;
+    private final OrderMaterialSnapshotR2dbcRepository repository;
 
     @Override
     public Mono<OrderMaterialSnapshot> save(OrderMaterialSnapshot snapshot) {
