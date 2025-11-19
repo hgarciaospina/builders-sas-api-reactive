@@ -1,64 +1,88 @@
 package com.builderssas.api.infrastructure.persistence.entity;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
- * Entidad persistente que representa los tipos de material.
+ * Entidad persistente que representa un tipo de material.
  *
- * Se usa exclusivamente en la capa de infraestructura para mapear
- * la tabla "material_types" a la base de datos mediante R2DBC.
+ * Esta clase forma parte de la capa de Infraestructura dentro de la
+ * Arquitectura Hexagonal. Su única responsabilidad es reflejar la
+ * estructura de la tabla "material_types" para R2DBC.
+ *
+ * Características:
+ *  • 100% inmutable (sin setters ni mutaciones).
+ *  • Campos finales para garantizar consistencia.
+ *  • Constructor completo anotado con @PersistenceCreator.
+ *  • Sin constructor vacío.
  *
  * No contiene lógica de negocio.
  */
 @Table("material_types")
 public class MaterialTypeEntity {
 
-    /** Identificador único del tipo de material. */
     @Id
     @Column("id")
-    private Long id;
+    private final Long id;
 
-    /** Nombre del material. */
+    /** Código único del material (CE, AR, GR, etc.) */
+    @Column("code")
+    private final String code;
+
+    /** Nombre del material (Cemento, Arena, etc.) */
     @Column("name")
-    private String name;
+    private final String name;
 
-    /** Unidad de medida del material (kg, m3, m2, etc). */
+    /** Unidad de medida (kg, m3, unidades, etc.) */
     @Column("unit_of_measure")
-    private String unitOfMeasure;
+    private final String unitOfMeasure;
 
     /** Indicador de si el material está activo. */
     @Column("active")
-    private Boolean active;
+    private final Boolean active;
 
-    // -------------------------------------------------------
-    // Constructor vacío requerido por R2DBC
-    // -------------------------------------------------------
-    public MaterialTypeEntity() {}
-
-    // -------------------------------------------------------
-    // Constructor completo
-    // -------------------------------------------------------
-    public MaterialTypeEntity(Long id, String name, String unitOfMeasure, Boolean active) {
+    /**
+     * Constructor completo utilizado por Spring Data R2DBC.
+     * La anotación @PersistenceCreator indica que este es
+     * el constructor que se debe usar para hidratar la entidad.
+     */
+    @PersistenceCreator
+    public MaterialTypeEntity(
+            Long id,
+            String code,
+            String name,
+            String unitOfMeasure,
+            Boolean active
+    ) {
         this.id = id;
+        this.code = code;
         this.name = name;
         this.unitOfMeasure = unitOfMeasure;
         this.active = active;
     }
 
-    // -------------------------------------------------------
-    // Getters & Setters estandarizados
-    // -------------------------------------------------------
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    // ================================
+    // GETTERS (sin setters)
+    // ================================
+    public Long getId() {
+        return id;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public String getCode() {
+        return code;
+    }
 
-    public String getUnitOfMeasure() { return unitOfMeasure; }
-    public void setUnitOfMeasure(String unitOfMeasure) { this.unitOfMeasure = unitOfMeasure; }
+    public String getName() {
+        return name;
+    }
 
-    public Boolean getActive() { return active; }
-    public void setActive(Boolean active) { this.active = active; }
+    public String getUnitOfMeasure() {
+        return unitOfMeasure;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
 }

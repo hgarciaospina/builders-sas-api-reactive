@@ -1,25 +1,24 @@
 package com.builderssas.api.application.usecase.materialtype;
 
 import com.builderssas.api.domain.model.materialtype.MaterialTypeRecord;
-import com.builderssas.api.domain.port.in.materialtype.CreateMaterialTypeUseCase;
+import com.builderssas.api.domain.port.in.materialtype.ListActiveMaterialTypesUseCase;
 import com.builderssas.api.domain.port.out.materialtype.MaterialTypeRepositoryPort;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 
 /**
- * Caso de uso para crear un tipo de material.
- * Atómico — 1 caso de uso → 1 operación.
+ * Caso de uso para listar únicamente materiales activos.
  */
 @Service
 @RequiredArgsConstructor
-public class CreateMaterialTypeService implements CreateMaterialTypeUseCase {
+public class ListActiveMaterialTypesService implements ListActiveMaterialTypesUseCase {
 
     private final MaterialTypeRepositoryPort repository;
 
     @Override
-    public Mono<MaterialTypeRecord> create(MaterialTypeRecord command) {
-        return repository.save(command);
+    public Flux<MaterialTypeRecord> listActive() {
+        return repository.findAllActive();
     }
 }

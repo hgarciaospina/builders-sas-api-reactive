@@ -3,105 +3,83 @@ package com.builderssas.api.infrastructure.persistence.adapter;
 import com.builderssas.api.domain.model.materialtype.MaterialTypeRecord;
 import com.builderssas.api.domain.port.out.materialtype.MaterialTypeRepositoryPort;
 import com.builderssas.api.infrastructure.persistence.entity.MaterialTypeEntity;
+import com.builderssas.api.infrastructure.persistence.mapper.MaterialTypeMapper;
 import com.builderssas.api.infrastructure.persistence.repository.MaterialTypeR2dbcRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Optional;
-
 /**
- * Adaptador R2DBC encargado de implementar el puerto de salida
- * {@link MaterialTypeRepositoryPort} para la persistencia de tipos de material.
+ * Adaptador R2DBC para MaterialType.
  *
- * Responsabilidades:
- *  - Mapear entre {@link MaterialTypeEntity} (infraestructura) y
- *    {@link MaterialTypeRecord} (dominio).
- *  - Delegar las operaciones reactivas al repositorio R2DBC.
- *
- * No introduce lógica de negocio ni programación imperativa.
+ * 100% reactivo y sin lógica de negocio.
+ * El filtrado por activos se aplica únicamente en los casos de uso.
  */
 @Component
 @RequiredArgsConstructor
 public class MaterialTypeR2dbcAdapter implements MaterialTypeRepositoryPort {
 
     private final MaterialTypeR2dbcRepository repository;
-
-    // ============================================================================
-    // MAPEADORES FUNCIONALES — Entity ↔ Record
-    // ============================================================================
-
-    private MaterialTypeRecord toDomain(MaterialTypeEntity entity) {
-        return Optional.ofNullable(entity)
-                .map(e -> new MaterialTypeRecord(
-                        e.getId(),
-                        e.getName(),
-                        e.getUnitOfMeasure(),
-                        e.getActive()
-                ))
-                .orElse(null);
-    }
-
-    private MaterialTypeEntity toEntity(MaterialTypeRecord record) {
-        return Optional.ofNullable(record)
-                .map(r -> new MaterialTypeEntity(
-                        r.id(),
-                        r.name(),
-                        r.unitOfMeasure(),
-                        r.active()
-                ))
-                .orElse(null);
-    }
-
-    // ============================================================================
-    // CRUD REACTIVO — Implementación del Puerto
-    // ============================================================================
+    private final MaterialTypeMapper mapper;
 
     /**
-     * Recupera un tipo de material por su identificador.
-     *
-     * @param id identificador del tipo de material
-     * @return Mono con el tipo encontrado o vacío si no existe
+     * Busca un tipo de material por su ID.
+     * El caso de uso decide si filtra activos.
      */
     @Override
     public Mono<MaterialTypeRecord> findById(Long id) {
         return repository.findById(id)
-                .map(this::toDomain);
+                .map(mapper::toRecord);
     }
 
     /**
-     * Recupera todos los tipos de material.
-     *
-     * @return Flux con todos los tipos de material
+     * Lista todos los tipos de material (activos + inactivos).
      */
     @Override
     public Flux<MaterialTypeRecord> findAll() {
         return repository.findAll()
-                .map(this::toDomain);
+                .map(mapper::toRecord);
     }
 
     /**
-     * Persiste o actualiza un tipo de material.
-     *
-     * @param aggregate record de dominio a persistir
-     * @return Mono con el tipo persistido
+     * Lista solo materiales activos.
      */
     @Override
-    public Mono<MaterialTypeRecord> save(MaterialTypeRecord aggregate) {
-        return repository.save(toEntity(aggregate))
-                .map(this::toDomain);
+    public Flux<MaterialTypeRecord> findAllActive() {
+        return repository.findAll()
+                .filter(entity -> Boolean.TRUE.equals(entity.getActive()))
+                .map(mapper::toRecord);
     }
 
+    /**
+     * Crea o actualiza un material.
+     */
     @Override
-    public Mono<Boolean> hasSufficientStockForType(Long constructionTypeId) {
-        // Implementación NO-OP temporal: siempre indica que hay stock suficiente.
-        return Mono.just(Boolean.TRUE);
+    public Mono<MaterialTypeRecord> save(MaterialTypeRecord record) {
+        return Mono.just(record)
+                .map(mapper::toEntity)
+                .flatMap(repository::save)
+                .map(mapper::toRecord);
     }
 
+    /**
+     * Soft delete: marca el material como inactivo.
+     */
     @Override
-    public Mono<Void> discountStockForType(Long constructionTypeId) {
-        // Implementación NO-OP temporal: no realiza cambios en la base de datos.
-        return Mono.empty();
+    public Mono<Void> softDelete(Long id) {
+        return repository.findById(id)
+                .map(entity ->
+                        new MaterialTypeEntity(
+                                entity.getId(),
+                                entity.getCode(),        // <── FALTABA
+                                entity.getName(),
+                                entity.getUnitOfMeasure(),
+                                Boolean.FALSE            // <── se inactiva
+                        )
+                )
+                .flatMap(repository::save)
+                .then();
     }
 }
