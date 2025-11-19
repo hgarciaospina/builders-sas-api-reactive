@@ -1,53 +1,77 @@
 package com.builderssas.api.infrastructure.persistence.mapper;
 
-import com.builderssas.api.domain.model.inventory.InventoryMovement;
+import com.builderssas.api.domain.model.inventory.InventoryMovementRecord;
 import com.builderssas.api.infrastructure.persistence.entity.InventoryMovementEntity;
-import org.springframework.stereotype.Component;
 
 /**
- * Mapper funcional que convierte entre:
- *  - InventoryMovement (dominio, record inmutable)
- *  - InventoryMovementEntity (infraestructura, entidad inmutable)
+ * Mapper funcional encargado de convertir entre:
+ * - InventoryMovementRecord (dominio)
+ * - InventoryMovementEntity (infraestructura)
+ *
+ * Este componente no contiene lógica de negocio. Su responsabilidad es
+ * transformar estructuras de datos entre capas sin introducir mutación.
+ *
+ * Reglas:
+ * - Sin programación imperativa.
+ * - Sin if/else, sin ternarios y sin Optional.map.orElse.
+ * - Conversiones directas campo a campo.
+ * - El mapper no depende de servicios ni repositorios.
  */
-@Component
-public class InventoryMovementMapper {
+public final class InventoryMovementMapper {
 
-    public InventoryMovement toDomain(InventoryMovementEntity e) {
-        return new InventoryMovement(
-                e.getMaterialId(),
-                e.getMaterialName(),
-                e.getUnitOfMeasure(),
-                e.getMovementType(),
-                e.getQuantity(),
-                e.getPreviousStock(),
-                e.getFinalStock(),
-                e.getMovementDate(),
-                e.getOrderId(),
-                e.getReason(),
-                e.getStatus(),
-                e.getUserId(),
-                e.getUserFullName(),
-                e.getUserRole()
+    private InventoryMovementMapper() {
+        // Constructor privado para mantener el mapper como utilidad pura.
+    }
+
+    /**
+     * Convierte una entidad persistente a un record del dominio.
+     *
+     * @param entity entidad persistente InventoryMovementEntity
+     * @return record InventoryMovementRecord
+     */
+    public static InventoryMovementRecord toDomain(InventoryMovementEntity entity) {
+        return new InventoryMovementRecord(
+                entity.getId(),
+                entity.getMaterialId(),
+                entity.getMaterialName(),
+                entity.getUnitOfMeasure(),
+                entity.getMovementType(),
+                entity.getQuantity(),
+                entity.getPreviousStock(),
+                entity.getFinalStock(),
+                entity.getMovementDate(),
+                entity.getOrderId(),
+                entity.getReason(),
+                entity.getStatus(),
+                entity.getUserId(),
+                entity.getUserFullName(),
+                entity.getUserRole()
         );
     }
 
-    public InventoryMovementEntity toEntity(InventoryMovement d) {
+    /**
+     * Convierte un record del dominio a una entidad persistente.
+     *
+     * @param record InventoryMovementRecord del dominio
+     * @return InventoryMovementEntity para insertar o consultar con R2DBC
+     */
+    public static InventoryMovementEntity toEntity(InventoryMovementRecord record) {
         return new InventoryMovementEntity(
-                null,                   // id (autogenerado por BD)
-                d.materialId(),
-                d.materialName(),
-                d.unitOfMeasure(),
-                d.movementType(),
-                d.quantity(),
-                d.previousStock(),
-                d.finalStock(),
-                d.movementDate(),
-                d.orderId(),
-                d.reason(),
-                d.status(),
-                d.userId(),
-                d.userFullName(),
-                d.userRole()
+                record.id(),
+                record.materialId(),
+                record.materialName(),
+                record.unitOfMeasure(),
+                record.movementType(),
+                record.quantity(),
+                record.previousStock(),
+                record.finalStock(),
+                record.movementDate(),
+                record.orderId(),
+                record.reason(),
+                record.status(),
+                record.userId(),
+                record.userFullName(),
+                record.userRole()
         );
     }
 }

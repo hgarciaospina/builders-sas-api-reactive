@@ -1,50 +1,45 @@
 package com.builderssas.api.infrastructure.persistence.repository;
 
 import com.builderssas.api.infrastructure.persistence.entity.InventoryMovementEntity;
-
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
-import org.springframework.stereotype.Repository;
-
 import reactor.core.publisher.Flux;
 
 /**
- * Repositorio R2DBC para la persistencia de movimientos de inventario.
+ * Repositorio R2DBC para la entidad InventoryMovementEntity.
  *
- * Esta interfaz permite almacenar, consultar y auditar todos los
- * movimientos registrados en el sistema.
+ * Esta interfaz pertenece exclusivamente a la capa de infraestructura
+ * y define las consultas reactivas sobre la tabla inventory_movements.
  *
- * La responsabilidad del repositorio es estrictamente acceso a datos;
- * la lógica de negocio se ejecuta en los casos de uso.
+ * Es utilizada únicamente por los adaptadores de persistencia, quienes
+ * implementan los puertos de dominio. Aquí NO va lógica de negocio.
  */
-@Repository
 public interface InventoryMovementR2dbcRepository
         extends ReactiveCrudRepository<InventoryMovementEntity, Long> {
 
     /**
-     * Obtiene todos los movimientos asociados a un material.
+     * Obtiene los movimientos asociados a un material.
+     *
+     * @param materialId identificador del material
+     * @return flujo reactivo de entidades InventoryMovementEntity
      */
     Flux<InventoryMovementEntity> findByMaterialId(Long materialId);
 
     /**
-     * Obtiene todos los movimientos asociados a una orden.
+     * Obtiene los movimientos asociados a una orden específica.
+     *
+     * @param orderId identificador de la orden
+     * @return flujo reactivo de entidades InventoryMovementEntity
      */
     Flux<InventoryMovementEntity> findByOrderId(Long orderId);
 
     /**
-     * Obtiene todos los movimientos realizados por un usuario específico.
+     * Obtiene los movimientos registrados por un usuario específico.
+     *
+     * Esta consulta permite obtener la trazabilidad completa
+     * de los movimientos hechos por un usuario en el sistema.
+     *
+     * @param userId identificador del usuario
+     * @return flujo reactivo de entidades InventoryMovementEntity
      */
     Flux<InventoryMovementEntity> findByUserId(Long userId);
-
-    /**
-     * Busca movimientos por fecha exacta.
-     */
-    Flux<InventoryMovementEntity> findByMovementDateBetween(
-            java.time.LocalDateTime start,
-            java.time.LocalDateTime end
-    );
-
-    /**
-     * Permite auditorías detalladas por rol del usuario.
-     */
-    Flux<InventoryMovementEntity> findByUserRole(String userRole);
 }
