@@ -66,7 +66,7 @@ public class MaterialTypeController {
     /**
      * Lista únicamente materiales activos.
      */
-    @GetMapping
+    @GetMapping("/active")
     public Flux<MaterialTypeResponseDto> listActive() {
         return listActiveUseCase.listActive()
                 .map(webMapper::toResponse);

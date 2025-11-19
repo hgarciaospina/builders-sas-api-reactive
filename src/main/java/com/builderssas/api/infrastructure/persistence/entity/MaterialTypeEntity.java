@@ -48,7 +48,6 @@ public class MaterialTypeEntity {
      * La anotación @PersistenceCreator indica que este es
      * el constructor que se debe usar para hidratar la entidad.
      */
-    @PersistenceCreator
     public MaterialTypeEntity(
             Long id,
             String code,
