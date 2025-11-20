@@ -9,99 +9,83 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Optional;
-
 /**
- * Adaptador R2DBC para la entidad {@link RoleEntity}.
- *
- * Este componente forma parte de la capa de infraestructura dentro de la
- * Arquitectura Hexagonal. Su responsabilidad es estrictamente técnica:
- *
- *   • Convertir entre Entity ↔ Record del dominio
- *   • Delegar operaciones al repositorio reactivo R2DBC
- *
- * No implementa ninguna lógica de negocio.
+ * Adaptador R2DBC para RoleEntity.
  */
 @Component
 @RequiredArgsConstructor
 public class RoleR2dbcAdapter implements RoleRepositoryPort {
 
-    /** Repositorio R2DBC encargado del acceso a la base de datos. */
     private final RoleR2dbcRepository repository;
 
-    // ============================================================================
-    // MAPPERS — funcionales, sin imperativa, consistentes con el dominio
-    // ============================================================================
+    // ============================
+    //        MAPPERS
+    // ============================
 
-    /**
-     * Convierte una {@link RoleEntity} en un {@link RoleRecord}.
-     *
-     * @param e entidad persistida
-     * @return instancia del dominio o null
-     */
     private RoleRecord toDomain(RoleEntity e) {
-        return Optional.ofNullable(e)
-                .map(x -> new RoleRecord(
-                        x.getId(),
-                        x.getName(),
-                        x.getDescription(),
-                        x.getActive()
-                ))
-                .orElse(null);
+        return new RoleRecord(
+                e.getId(),
+                e.getName(),
+                e.getDescription(),
+                e.getActive()
+        );
     }
 
-    /**
-     * Convierte un {@link RoleRecord} en una {@link RoleEntity}.
-     *
-     * @param d record del dominio
-     * @return entity equivalente o null
-     */
     private RoleEntity toEntity(RoleRecord d) {
-        return Optional.ofNullable(d)
-                .map(x -> {
-                    RoleEntity e = new RoleEntity();
-                    e.setId(x.id());
-                    e.setName(x.name());
-                    e.setDescription(x.description());
-                    e.setActive(x.active());
-                    return e;
-                })
-                .orElse(null);
+        return new RoleEntity(
+                d.id(),
+                d.name(),
+                d.description(),
+                d.active()
+        );
     }
 
-    // ============================================================================
-    // CRUD REACTIVO — Implementación del Puerto
-    // ============================================================================
+    // ============================
+    //     IMPLEMENTACIÓN PORT
+    // ============================
 
-    /**
-     * Busca un rol por su ID.
-     *
-     * @param id identificador único
-     * @return Mono con el record del dominio
-     */
     @Override
-    public Mono<RoleRecord> findById(Long id) {
-        return repository.findById(id).map(this::toDomain);
+    public Mono<RoleRecord> save(RoleRecord role) {
+        return repository.save(toEntity(role)).map(this::toDomain);
     }
 
-    /**
-     * Obtiene todos los roles registrados en el sistema.
-     *
-     * @return Flux con todos los roles
-     */
     @Override
     public Flux<RoleRecord> findAll() {
         return repository.findAll().map(this::toDomain);
     }
 
-    /**
-     * Guarda o actualiza un rol.
-     *
-     * @param aggregate record del dominio
-     * @return Mono con la instancia del dominio persistida
-     */
     @Override
-    public Mono<RoleRecord> save(RoleRecord aggregate) {
-        return repository.save(toEntity(aggregate)).map(this::toDomain);
+    public Mono<RoleRecord> findById(Long id) {
+        return repository.findById(id).map(this::toDomain);
+    }
+
+    @Override
+    public Mono<RoleRecord> findByName(String name) {
+        return repository.findByName(name).map(this::toDomain);
+    }
+
+    @Override
+    public Mono<RoleRecord> findByDescription(String description) {
+        return repository.findByDescription(description).map(this::toDomain);
+    }
+
+    @Override
+    public Mono<Boolean> existsByName(String name) {
+        return repository.existsByName(name);
+    }
+
+    @Override
+    public Mono<Boolean> existsByDescription(String description) {
+        return repository.existsByDescription(description);
+    }
+
+    @Override
+    public Mono<RoleRecord> update(RoleRecord role) {
+        return repository.save(toEntity(role)).map(this::toDomain);
+    }
+
+    @Override
+    public Mono<Void> delete(Long id) {
+        return repository.deleteById(id);
     }
 }

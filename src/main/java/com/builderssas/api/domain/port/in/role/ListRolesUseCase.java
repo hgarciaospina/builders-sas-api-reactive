@@ -4,6 +4,5 @@ import com.builderssas.api.domain.model.role.RoleRecord;
 import reactor.core.publisher.Flux;
 
 public interface ListRolesUseCase {
-
     Flux<RoleRecord> listAll();
 }
