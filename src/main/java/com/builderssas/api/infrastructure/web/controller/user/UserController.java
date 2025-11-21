@@ -6,6 +6,7 @@ import com.builderssas.api.domain.port.in.user.GetUserByIdUseCase;
 import com.builderssas.api.domain.port.in.user.UpdateUserUseCase;
 import com.builderssas.api.domain.port.in.user.DeleteUserUseCase;
 import com.builderssas.api.domain.port.in.user.GetInactiveUsersUseCase;
+import com.builderssas.api.domain.port.in.user.GetActiveUsersUseCase; // 🔹 AGREGADO
 
 import com.builderssas.api.infrastructure.web.dto.user.CreateUserDto;
 import com.builderssas.api.infrastructure.web.dto.user.UpdateUserDto;
@@ -38,12 +39,16 @@ public class UserController {
     private final CreateUserUseCase createUserUseCase;
     private final GetUserByIdUseCase getUserByIdUseCase;
     private final GetAllUsersUseCase getAllUsersUseCase;
-    private final GetInactiveUsersUseCase getInactiveUsersUseCase; // 🔹 AGREGADO
+    private final GetInactiveUsersUseCase getInactiveUsersUseCase;
+    private final GetActiveUsersUseCase getActiveUsersUseCase;
     private final UpdateUserUseCase updateUserUseCase;
     private final DeleteUserUseCase deleteUserUseCase;
 
     /**
-     * Obtiene todos los usuarios activos del sistema.
+     * Obtiene todos los usuarios (activos + inactivos).
+     *
+     * Se usa principalmente en vistas administrativas
+     * donde se requiere el listado completo.
      *
      * @return flujo reactivo de UserDto
      */
@@ -54,7 +59,24 @@ public class UserController {
     }
 
     /**
+     * Obtiene únicamente los usuarios activos del sistema.
+     *
+     * Esta ruta permite discriminar explícitamente los registros habilitados,
+     * facilitando vistas operativas o validaciones administrativas.
+     *
+     * @return flujo reactivo de UserDto
+     */
+    @GetMapping("/active")
+    public Flux<UserDto> getAllActive() {
+        return getActiveUsersUseCase.getActiveUsers()
+                .map(UserWebMapper::toDto);
+    }
+
+    /**
      * Obtiene todos los usuarios inactivos (soft delete).
+     *
+     * Útil para procesos de auditoría,
+     * validaciones de offboarding o revisiones administrativas.
      *
      * @return flujo reactivo de UserDto
      */
