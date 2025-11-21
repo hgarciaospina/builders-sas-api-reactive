@@ -49,15 +49,17 @@ public class CreateUserService implements CreateUserUseCase {
                                 )
                         );
 
-        // 3) Crear record de dominio (activo = TRUE)
+        // 3) Crear record de dominio — ejecución diferida (CORRECCIÓN)
         Mono<UserRecord> onCreate =
-                Mono.just(
-                        new UserRecord(
-                                null,
-                                dto.username(),
-                                dto.displayName(),
-                                dto.email(),
-                                true
+                Mono.defer(() ->
+                        Mono.just(
+                                new UserRecord(
+                                        null,
+                                        dto.username(),
+                                        dto.displayName(),
+                                        dto.email(),
+                                        true
+                                )
                         )
                 );
 

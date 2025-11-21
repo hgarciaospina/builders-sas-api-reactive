@@ -14,13 +14,13 @@ public interface UserR2dbcRepository extends ReactiveCrudRepository<UserEntity, 
     /**
      * Busca un usuario por email.
      */
-    @Query("SELECT * FROM users WHERE email = :email")
+    @Query("SELECT * FROM users WHERE email = :email LIMIT 1")
     Mono<UserEntity> findByEmail(String email);
 
     /**
      * Busca un usuario por username.
      */
-    @Query("SELECT * FROM users WHERE username = :username")
+    @Query("SELECT * FROM users WHERE username = :username LIMIT 1")
     Mono<UserEntity> findByUsername(String username);
 
     /**
