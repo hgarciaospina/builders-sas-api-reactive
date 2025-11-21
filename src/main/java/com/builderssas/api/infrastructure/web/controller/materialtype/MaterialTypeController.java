@@ -12,22 +12,13 @@ import com.builderssas.api.infrastructure.web.dto.materialtype.MaterialTypeUpdat
 import com.builderssas.api.infrastructure.web.dto.materialtype.MaterialTypeResponseDto;
 
 import com.builderssas.api.infrastructure.web.mapper.MaterialTypeWebMapper;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-/**
- * Controlador WebFlux encargado de exponer las operaciones CRUD
- * para tipos de material dentro de la Arquitectura Hexagonal.
- *
- * Solo recibe peticiones HTTP, delega en casos de uso y convierte
- * DTOs ↔ Records mediante el WebMapper.
- *
- * No contiene lógica de negocio.
- */
 @RestController
 @RequestMapping("/api/v1/material-types")
 @RequiredArgsConstructor
@@ -39,65 +30,46 @@ public class MaterialTypeController {
     private final ListMaterialTypesUseCase listAllUseCase;
     private final UpdateMaterialTypeUseCase updateUseCase;
     private final DeleteMaterialTypeUseCase deleteUseCase;
-    private final MaterialTypeWebMapper webMapper;
 
-    /**
-     * Crea un nuevo tipo de material.
-     */
     @PostMapping
     public Mono<MaterialTypeResponseDto> create(
             @Valid @RequestBody MaterialTypeCreateDto dto
     ) {
         return Mono.just(dto)
-                .map(webMapper::toRecord)
+                .map(MaterialTypeWebMapper::toRecord)
                 .flatMap(createUseCase::create)
-                .map(webMapper::toResponse);
+                .map(MaterialTypeWebMapper::toResponse);
     }
 
-    /**
-     * Consulta un tipo de material activo por ID.
-     */
     @GetMapping("/{id}")
     public Mono<MaterialTypeResponseDto> getById(@PathVariable Long id) {
         return getUseCase.getById(id)
-                .map(webMapper::toResponse);
+                .map(MaterialTypeWebMapper::toResponse);
     }
 
-    /**
-     * Lista únicamente materiales activos.
-     */
     @GetMapping("/active")
     public Flux<MaterialTypeResponseDto> listActive() {
         return listActiveUseCase.listActive()
-                .map(webMapper::toResponse);
+                .map(MaterialTypeWebMapper::toResponse);
     }
 
-    /**
-     * Lista todos los materiales (activos + inactivos).
-     */
     @GetMapping("/all")
     public Flux<MaterialTypeResponseDto> listAll() {
         return listAllUseCase.listAll()
-                .map(webMapper::toResponse);
+                .map(MaterialTypeWebMapper::toResponse);
     }
 
-    /**
-     * Actualiza un tipo de material.
-     */
     @PutMapping("/{id}")
     public Mono<MaterialTypeResponseDto> update(
             @PathVariable Long id,
             @Valid @RequestBody MaterialTypeUpdateDto dto
     ) {
         return Mono.just(dto)
-                .map(d -> webMapper.toRecord(id, d))
+                .map(d -> MaterialTypeWebMapper.toRecord(id, d))
                 .flatMap(r -> updateUseCase.update(id, r))
-                .map(webMapper::toResponse);
+                .map(MaterialTypeWebMapper::toResponse);
     }
 
-    /**
-     * Borrado lógico.
-     */
     @DeleteMapping("/{id}")
     public Mono<Void> delete(@PathVariable Long id) {
         return deleteUseCase.delete(id);

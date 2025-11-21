@@ -5,85 +5,76 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
- * Entidad persistente que representa un usuario dentro del sistema.
+ * Entidad persistente e inmutable que representa un usuario dentro del sistema.
  *
- * Su responsabilidad es reflejar la estructura de la tabla "users"
- * en la base de datos. No contiene lógica de negocio; únicamente
- * expone los campos necesarios para operaciones de lectura y escritura.
+ * Esta clase refleja exactamente la estructura de la tabla "users"
+ * en la base de datos. No contiene lógica de negocio, setters,
+ * mutaciones ni constructores vacíos, cumpliendo las reglas del
+ * proyecto Builders-SAS de mantener infraestructura totalmente
+ * inmutable.
+ *
+ * Su única responsabilidad es transportar datos hacia/desde la
+ * capa de persistencia utilizando R2DBC.
  */
 @Table("users")
-public class UserEntity {
+public final class UserEntity {
 
     /** Identificador único del usuario. */
     @Id
     @Column("id")
-    private Long id;
+    private final Long id;
 
-    /** Nombre de usuario utilizado para autenticación. */
+    /** Nombre de usuario utilizado internamente para autenticación. */
     @Column("username")
-    private String username;
+    private final String username;
 
     /** Nombre visible del usuario en la aplicación. */
     @Column("display_name")
-    private String displayName;
+    private final String displayName;
 
     /** Correo electrónico del usuario. */
     @Column("email")
-    private String email;
+    private final String email;
+
+    /** Indicador lógico del estado del usuario. */
+    @Column("active")
+    private final Boolean active;
 
     /**
-     * Indicador lógico de si el usuario está activo.
-     * Declarado como Boolean para mantener consistencia
-     * con el modelo de dominio y evitar problemas de nullability.
+     * Constructor completo para creación inmutable de la entidad.
      */
-    @Column("active")
-    private Boolean active;
-
-    // ================================================================================
-    // GETTERS & SETTERS — estandarizados y consistentes con los records/adapters
-    // ================================================================================
-
-    public Long getId() {
-        return id;
+    public UserEntity(
+            Long id,
+            String username,
+            String displayName,
+            String email,
+            Boolean active
+    ) {
+        this.id = id;
+        this.username = username;
+        this.displayName = displayName;
+        this.email = email;
+        this.active = active;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    // Getters inmutables — requeridos por Spring Data R2DBC
+    public Long getId() {
+        return id;
     }
 
     public String getUsername() {
         return username;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     public String getDisplayName() {
         return displayName;
-    }
-
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
     }
 
     public String getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    /**
-     * Getter estandarizado para el campo "active".
-     * Obligatorio para que los adaptadores puedan mapear el valor.
-     */
     public Boolean getActive() {
         return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
     }
 }

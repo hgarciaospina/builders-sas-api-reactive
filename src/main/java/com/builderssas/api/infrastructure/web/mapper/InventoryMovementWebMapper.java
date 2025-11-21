@@ -1,32 +1,25 @@
 package com.builderssas.api.infrastructure.web.mapper;
 
 import com.builderssas.api.domain.model.inventory.InventoryMovementRecord;
-
 import com.builderssas.api.infrastructure.web.dto.inventorymovement.InventoryMovementRequestDto;
 import com.builderssas.api.infrastructure.web.dto.inventorymovement.InventoryMovementResponseDto;
-import org.springframework.stereotype.Component;
 
 /**
- * Mapper encargado de transformar entre:
- *  - DTOs recibidos desde la capa web
- *  - Records del dominio (InventoryMovementRecord)
- *  - DTOs enviados como respuesta
+ * Mapper Web estático para movimientos de inventario.
  *
- * No contiene lógica de negocio.
- * Solo conversión de estructuras.
+ * Convierte:
+ *  - InventoryMovementRequestDto → InventoryMovementRecord
+ *  - InventoryMovementRecord → InventoryMovementResponseDto
+ *
+ * No usa Spring, no es un bean, no se inyecta.
  */
-@Component
-public class InventoryMovementWebMapper {
+public final class InventoryMovementWebMapper {
 
-    /**
-     * Convierte un DTO de solicitud en un record del dominio.
-     *
-     * @param dto objeto enviado desde frontend
-     * @return record de dominio listo para la capa aplicación
-     */
-    public InventoryMovementRecord toDomain(InventoryMovementRequestDto dto) {
+    private InventoryMovementWebMapper() {}
+
+    public static InventoryMovementRecord toDomain(InventoryMovementRequestDto dto) {
         return new InventoryMovementRecord(
-                null,                           // id siempre null en creación
+                null,                       // id generado por BD
                 dto.materialId(),
                 dto.materialName(),
                 dto.unitOfMeasure(),
@@ -35,7 +28,7 @@ public class InventoryMovementWebMapper {
                 dto.previousStock(),
                 dto.finalStock(),
                 dto.movementDate(),
-                dto.orderId(),
+                dto.orderId(),              // null si es movimiento independiente
                 dto.reason(),
                 dto.status(),
                 dto.userId(),
@@ -44,13 +37,7 @@ public class InventoryMovementWebMapper {
         );
     }
 
-    /**
-     * Convierte un record del dominio en un DTO de respuesta.
-     *
-     * @param record record proveniente de la capa dominio
-     * @return DTO de respuesta para exposición web
-     */
-    public InventoryMovementResponseDto toResponse(InventoryMovementRecord record) {
+    public static InventoryMovementResponseDto toResponse(InventoryMovementRecord record) {
         return new InventoryMovementResponseDto(
                 record.id(),
                 record.materialId(),

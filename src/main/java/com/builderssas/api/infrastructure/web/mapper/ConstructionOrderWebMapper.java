@@ -3,32 +3,31 @@ package com.builderssas.api.infrastructure.web.mapper;
 import com.builderssas.api.domain.model.constructionorder.ConstructionOrderRecord;
 import com.builderssas.api.infrastructure.web.dto.constructionorder.ConstructionOrderResponseDto;
 import com.builderssas.api.infrastructure.web.dto.constructionorder.CreateConstructionOrderRequestDto;
-import org.springframework.stereotype.Component;
-
-import java.time.LocalDateTime;
 
 /**
- * Mapper Web encargado de convertir:
+ * Mapper Web para convertir entre DTOs y Records.
  *
- *   • ConstructionOrderRecord → ConstructionOrderResponseDto
- *   • CreateConstructionOrderRequestDto → ConstructionOrderRecord
+ * ✦ 100% estático
+ * ✦ Sin @Component
+ * ✦ Sin inyección en controladores
+ * ✦ No contiene lógica de negocio
+ * ✦ Solo transforma DTO ↔ Record
  *
- * Su función es estrictamente de transformación entre capas,
- * sin incluir ninguna lógica de negocio ni validaciones.
- *
- * Todas las transformaciones mantienen el principio de inmutabilidad
- * y siguen el flujo funcional del sistema.
+ * Esta es la forma correcta dentro de una arquitectura
+ * Hexagonal + WebFlux, permitiendo controladores ultra-livianos.
  */
-@Component
-public class ConstructionOrderWebMapper {
+public final class ConstructionOrderWebMapper {
+
+    // Constructor privado para evitar instanciación
+    private ConstructionOrderWebMapper() { }
 
     /**
-     * Convierte un record de dominio en un DTO de respuesta.
+     * Convierte un record de dominio a un DTO de respuesta HTTP.
      *
-     * @param r instancia inmutable de ConstructionOrderRecord
+     * @param r record del dominio (inmutable)
      * @return DTO listo para ser enviado al cliente
      */
-    public ConstructionOrderResponseDto toResponse(ConstructionOrderRecord r) {
+    public static ConstructionOrderResponseDto toResponse(ConstructionOrderRecord r) {
         return new ConstructionOrderResponseDto(
                 r.id(),
                 r.constructionRequestId(),
@@ -49,19 +48,17 @@ public class ConstructionOrderWebMapper {
     }
 
     /**
-     * Convierte el DTO de creación proveniente de la capa web
-     * en el record de dominio ConstructionOrderRecord.
+     * Convierte el DTO recibido en el POST a un record del dominio.
      *
-     * Campos de control como id, createdAt y updatedAt se
-     * inicializan en null para que la capa de aplicación
-     * (use case) sea la responsable de asignarlos.
+     * Los campos id, createdAt y updatedAt van en null para que
+     * el caso de uso asigne sus valores correctamente.
      *
-     * @param dto DTO recibido en el endpoint de creación
-     * @return record de dominio listo para ser procesado por el caso de uso
+     * @param dto DTO recibido desde el request body
+     * @return record de dominio listo para procesar
      */
-    public ConstructionOrderRecord toDomain(CreateConstructionOrderRequestDto dto) {
+    public static ConstructionOrderRecord toDomain(CreateConstructionOrderRequestDto dto) {
         return new ConstructionOrderRecord(
-                null,                           // id -> lo genera la BD
+                null,                           // id → generado por DB
                 dto.constructionRequestId(),
                 dto.projectId(),
                 dto.constructionTypeId(),
@@ -71,9 +68,9 @@ public class ConstructionOrderWebMapper {
                 dto.requestedDate(),
                 dto.scheduledStartDate(),
                 dto.scheduledEndDate(),
-                dto.orderStatus(),              // IN_PROGRESS viene desde el body por ahora
-                null,                           // createdAt -> lo asigna el use case
-                null,                           // updatedAt -> lo asigna el use case
+                dto.orderStatus(),
+                null,                           // createdAt → use case
+                null,                           // updatedAt → use case
                 dto.observations(),
                 dto.active()
         );

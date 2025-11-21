@@ -4,64 +4,64 @@ import com.builderssas.api.domain.model.constructionrequest.ConstructionRequestR
 import com.builderssas.api.domain.model.enums.RequestStatus;
 import com.builderssas.api.infrastructure.web.dto.constructionrequest.ConstructionRequestCreateDto;
 import com.builderssas.api.infrastructure.web.dto.constructionrequest.ConstructionRequestResponseDto;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
 /**
- * Mapper responsable de convertir entre los DTO utilizados en la capa web y
- * los records del dominio relacionados con ConstructionRequest.
+ * Mapper Web estático para convertir entre:
  *
- * Este componente no contiene lógica de negocio; únicamente transforma datos
- * entre las estructuras expuestas al cliente (DTOs) y el modelo interno del dominio.
+ *   • ConstructionRequestCreateDto → ConstructionRequestRecord
+ *   • ConstructionRequestRecord → ConstructionRequestResponseDto
  *
- * Las conversiones realizadas son completamente funcionales y no emplean
- * programación imperativa.
+ * No contiene lógica de negocio.
+ * No depende de Spring.
+ * No se inyecta en controladores.
+ *
+ * Sigue el modelo utilizado para todos los web mappers del proyecto.
  */
-@Component
-public class ConstructionRequestWebMapper {
+public final class ConstructionRequestWebMapper {
+
+    private ConstructionRequestWebMapper() { }
 
     /**
-     * Convierte un DTO de creación proveniente de la capa web en un record del dominio.
-     * Los valores generados automáticamente dentro del sistema se asignan aquí de forma
-     * predeterminada siguiendo las reglas establecidas.
+     * Convierte el DTO recibido en el POST en un record del dominio.
      *
-     * @param dto datos de entrada desde la petición web
-     * @return instancia de ConstructionRequestRecord preparada para la capa de aplicación
+     * @param dto datos enviados por el cliente
+     * @return record inmutable para el caso de uso
      */
-    public ConstructionRequestRecord toRecord(ConstructionRequestCreateDto dto) {
+    public static ConstructionRequestRecord toRecord(ConstructionRequestCreateDto dto) {
         return new ConstructionRequestRecord(
-                null,                                   // id generado en persistencia
-                dto.projectId(),                        // projectId
-                dto.constructionTypeId(),               // constructionTypeId
-                dto.latitude(),                         // latitude
-                dto.longitude(),                        // longitude
-                null,                                   // requestedByUserId (lo asigna seguridad)
-                LocalDate.now(),                        // requestDate generada automáticamente
-                RequestStatus.PENDING,                  // estado inicial de la solicitud
-                null,                                   // observations
-                Boolean.TRUE                            // active
+                null,                   // id → lo genera la BD
+                dto.projectId(),
+                dto.constructionTypeId(),
+                dto.latitude(),
+                dto.longitude(),
+                null,                   // requestedByUserId → lo asignará seguridad
+                LocalDate.now(),        // requestedDate → generado automáticamente
+                RequestStatus.PENDING,  // estado inicial
+                null,                   // observations
+                Boolean.TRUE            // active
         );
     }
 
     /**
-     * Convierte un record del dominio en un DTO de respuesta que será expuesto a la capa web.
+     * Convierte el record del dominio en un DTO de respuesta.
      *
-     * @param record instancia proveniente del dominio
-     * @return DTO de salida para consumidores externos
+     * @param r instance del record
+     * @return DTO para exponer al cliente
      */
-    public ConstructionRequestResponseDto toResponse(ConstructionRequestRecord record) {
+    public static ConstructionRequestResponseDto toResponse(ConstructionRequestRecord r) {
         return new ConstructionRequestResponseDto(
-                record.id(),
-                record.projectId(),
-                record.constructionTypeId(),
-                record.latitude(),
-                record.longitude(),
-                record.requestedByUserId(),
-                record.requestDate(),
-                record.requestStatus(),
-                record.observations(),
-                record.active()
+                r.id(),
+                r.projectId(),
+                r.constructionTypeId(),
+                r.latitude(),
+                r.longitude(),
+                r.requestedByUserId(),
+                r.requestDate(),
+                r.requestStatus(),
+                r.observations(),
+                r.active()
         );
     }
 }

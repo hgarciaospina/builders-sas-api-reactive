@@ -4,25 +4,31 @@ import com.builderssas.api.domain.model.materialtype.MaterialTypeRecord;
 import com.builderssas.api.infrastructure.web.dto.materialtype.MaterialTypeCreateDto;
 import com.builderssas.api.infrastructure.web.dto.materialtype.MaterialTypeUpdateDto;
 import com.builderssas.api.infrastructure.web.dto.materialtype.MaterialTypeResponseDto;
-import org.springframework.stereotype.Component;
 
 /**
- * Mapper Web ↔ Dominio para MaterialType.
+ * Mapper Web estático para MaterialType.
+ *
+ * Convierte:
+ *  - DTOs de entrada → Records de dominio
+ *  - Records de dominio → DTOs de respuesta
+ *
+ * No tiene lógica de negocio ni depende de Spring.
  */
-@Component
-public class MaterialTypeWebMapper {
+public final class MaterialTypeWebMapper {
 
-    public MaterialTypeRecord toRecord(MaterialTypeCreateDto dto) {
+    private MaterialTypeWebMapper() {}
+
+    public static MaterialTypeRecord toRecord(MaterialTypeCreateDto dto) {
         return new MaterialTypeRecord(
-                null,                 // id
-                dto.code(),           // code
-                dto.name(),           // name
-                dto.unitOfMeasure(),  // unitOfMeasure
-                true                  // active por defecto
+                null,
+                dto.code(),
+                dto.name(),
+                dto.unitOfMeasure(),
+                true
         );
     }
 
-    public MaterialTypeRecord toRecord(Long id, MaterialTypeUpdateDto dto) {
+    public static MaterialTypeRecord toRecord(Long id, MaterialTypeUpdateDto dto) {
         return new MaterialTypeRecord(
                 id,
                 dto.code(),
@@ -32,7 +38,7 @@ public class MaterialTypeWebMapper {
         );
     }
 
-    public MaterialTypeResponseDto toResponse(MaterialTypeRecord record) {
+    public static MaterialTypeResponseDto toResponse(MaterialTypeRecord record) {
         return new MaterialTypeResponseDto(
                 record.id(),
                 record.code(),

@@ -1,26 +1,15 @@
 package com.builderssas.api.infrastructure.web.controller.constructiontypematerial;
 
-import com.builderssas.api.domain.model.constructiontypematerial.ConstructionTypeMaterialRecord;
 import com.builderssas.api.domain.port.in.constructiontypematerial.*;
+import com.builderssas.api.infrastructure.web.dto.constructiontypematerial.*;
+import com.builderssas.api.infrastructure.web.mapper.ConstructionTypeMaterialWebMapper;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-/**
- * Controlador WebFlux para ConstructionTypeMaterial.
- *
- * Expone todas las operaciones CRUD reactivas:
- *  • Crear
- *  • Actualizar
- *  • Obtener por ID
- *  • Listar todos
- *  • Listar activos
- *  • Soft delete
- *
- * 100% reactivo y sin lógica de negocio.
- */
 @RestController
 @RequestMapping("/api/v1/construction-type-materials")
 @RequiredArgsConstructor
@@ -33,54 +22,47 @@ public final class ConstructionTypeMaterialController {
     private final ListActiveConstructionTypeMaterialUseCase listActiveUseCase;
     private final DeleteConstructionTypeMaterialUseCase deleteUseCase;
 
-    /**
-     * Crear un nuevo registro de ConstructionTypeMaterial.
-     */
     @PostMapping
-    public Mono<ConstructionTypeMaterialRecord> create(
-            @RequestBody ConstructionTypeMaterialRecord record
+    public Mono<ConstructionTypeMaterialResponseDto> create(
+            @Valid @RequestBody ConstructionTypeMaterialCreateDto dto
     ) {
-        return createUseCase.create(record);
+        return Mono.just(dto)
+                .map(ConstructionTypeMaterialWebMapper::toDomain)
+                .flatMap(createUseCase::create)
+                .map(ConstructionTypeMaterialWebMapper::toResponse);
     }
 
-    /**
-     * Actualizar un registro existente.
-     */
-    @PutMapping("/{id}")
-    public Mono<ConstructionTypeMaterialRecord> update(
-            @PathVariable Long id,
-            @RequestBody ConstructionTypeMaterialRecord record
+    @PutMapping
+    public Mono<ConstructionTypeMaterialResponseDto> update(
+            @Valid @RequestBody ConstructionTypeMaterialUpdateDto dto
     ) {
-        return updateUseCase.update(id, record);
+        return Mono.just(dto)
+                .map(ConstructionTypeMaterialWebMapper::toDomain)
+                .flatMap(record ->
+                        updateUseCase.update(dto.id(), record)   // ← ESTA ES LA FIRMA CORRECTA
+                )
+                .map(ConstructionTypeMaterialWebMapper::toResponse);
     }
 
-    /**
-     * Obtener un registro por ID.
-     */
+
     @GetMapping("/{id}")
-    public Mono<ConstructionTypeMaterialRecord> findById(@PathVariable Long id) {
-        return getUseCase.findById(id);
+    public Mono<ConstructionTypeMaterialResponseDto> findById(@PathVariable Long id) {
+        return getUseCase.findById(id)
+                .map(ConstructionTypeMaterialWebMapper::toResponse);
     }
 
-    /**
-     * Listar todos los registros.
-     */
-    @GetMapping("/all")
-    public Flux<ConstructionTypeMaterialRecord> findAll() {
-        return listUseCase.findAll();
+    @GetMapping
+    public Flux<ConstructionTypeMaterialResponseDto> listAll() {
+        return listUseCase.findAll()
+                .map(ConstructionTypeMaterialWebMapper::toResponse);
     }
 
-    /**
-     * Listar únicamente los registros activos.
-     */
     @GetMapping("/active")
-    public Flux<ConstructionTypeMaterialRecord> findAllActive() {
-        return listActiveUseCase.listActive();
+    public Flux<ConstructionTypeMaterialResponseDto> listActive() {
+        return listActiveUseCase.listActive()
+                .map(ConstructionTypeMaterialWebMapper::toResponse);
     }
 
-    /**
-     * Soft delete (marcar como inactivo).
-     */
     @DeleteMapping("/{id}")
     public Mono<Void> delete(@PathVariable Long id) {
         return deleteUseCase.delete(id);

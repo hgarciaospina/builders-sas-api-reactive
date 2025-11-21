@@ -21,47 +21,64 @@ public class ConstructionTypeController {
     private final ListActiveConstructionTypesUseCase listActiveUseCase;
     private final UpdateConstructionTypeUseCase updateUseCase;
     private final DeleteConstructionTypeUseCase deleteUseCase;
-    private final ConstructionTypeWebMapper webMapper;
 
+    /**
+     * Crea un nuevo tipo de construcción.
+     */
     @PostMapping
     public Mono<ConstructionTypeResponseDto> create(
             @Valid @RequestBody ConstructionTypeCreateDto dto
     ) {
         return Mono.just(dto)
-                .map(webMapper::toRecord)
+                .map(ConstructionTypeWebMapper::toRecord)
                 .flatMap(createUseCase::create)
-                .map(webMapper::toResponse);
+                .map(ConstructionTypeWebMapper::toResponse);
     }
 
+    /**
+     * Consulta un tipo de construcción por ID.
+     */
     @GetMapping("/{id}")
     public Mono<ConstructionTypeResponseDto> getById(@PathVariable Long id) {
         return getUseCase.getById(id)
-                .map(webMapper::toResponse);
+                .map(ConstructionTypeWebMapper::toResponse);
     }
 
+    /**
+     * Lista solo los tipos activos.
+     */
     @GetMapping
     public Flux<ConstructionTypeResponseDto> listActive() {
         return listActiveUseCase.listActive()
-                .map(webMapper::toResponse);
+                .map(ConstructionTypeWebMapper::toResponse);
     }
 
+    /**
+     * Lista todos los tipos de construcción.
+     */
     @GetMapping("/all")
     public Flux<ConstructionTypeResponseDto> listAll() {
         return listUseCase.listAll()
-                .map(webMapper::toResponse);
+                .map(ConstructionTypeWebMapper::toResponse);
     }
 
+    /**
+     * Actualiza un tipo de construcción.
+     */
     @PutMapping("/{id}")
     public Mono<ConstructionTypeResponseDto> update(
             @PathVariable Long id,
             @Valid @RequestBody ConstructionTypeUpdateDto dto
     ) {
         return Mono.just(dto)
-                .map(d -> webMapper.toRecord(id, d))
+                .map(d -> ConstructionTypeWebMapper.toRecord(id, d))
                 .flatMap(r -> updateUseCase.update(id, r))
-                .map(webMapper::toResponse);
+                .map(ConstructionTypeWebMapper::toResponse);
     }
 
+    /**
+     * Borrado lógico.
+     */
     @DeleteMapping("/{id}")
     public Mono<Void> delete(@PathVariable Long id) {
         return deleteUseCase.delete(id);

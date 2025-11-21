@@ -6,66 +6,48 @@ import com.builderssas.api.infrastructure.web.dto.role.UpdateRoleDto;
 import com.builderssas.api.infrastructure.web.dto.role.RoleResponseDto;
 
 /**
- * Mapper Web → Dominio y Dominio → Web.
+ * Mapper Web estático para el módulo Role.
  *
- * Este componente:
- * - No contiene lógica de negocio.
- * - No realiza validaciones.
- * - Mantiene inmutabilidad total.
- * - Aísla completamente la capa Web de la capa de dominio.
+ * Su función es transformar:
+ *  - DTOs → RoleRecord
+ *  - RoleRecord → DTOs
  *
- * Su responsabilidad exclusiva es transformar:
- *  DTOs → RoleRecord
- *  RoleRecord → DTOs
- *
- * Forma parte de la capa de infraestructura Web dentro de la arquitectura
- * hexagonal definida para el sistema.
+ * Sin lógica de negocio, sin validaciones,
+ * sin dependencia a Spring, sin inyección.
  */
 public final class RoleWebMapper {
 
-    private RoleWebMapper() {
-        // Previene instanciación
-    }
+    private RoleWebMapper() {}
 
     /**
-     * Convierte un DTO de creación en un RoleRecord de dominio.
-     * - El valor de "active" SIEMPRE es true al crear.
-     * - El id es generado por la persistencia.
-     *
-     * @param dto datos enviados desde la petición web
-     * @return RoleRecord listo para la capa de aplicación
+     * Transformación del DTO de creación hacia el record de dominio.
+     * - id = null (lo asigna persistencia)
+     * - active = true en creación
      */
     public static RoleRecord toDomain(CreateRoleDto dto) {
         return new RoleRecord(
-                null,                   // id generado por persistencia
+                null,
                 dto.name(),
                 dto.description(),
-                true                    // SIEMPRE true al crear
+                true
         );
     }
 
     /**
-     * Convierte un DTO de actualización en un RoleRecord.
-     * - No modifica "active" porque el estado pertenece al caso de uso
-     *   ToggleRoleStatusUseCase, no a este.
-     *
-     * @param dto DTO con los datos de actualización
-     * @return RoleRecord normalizado para actualizar
+     * Transformación del DTO de actualización hacia el record de dominio.
+     * - active NO se controla aquí (lo maneja ToggleRoleStatusUseCase)
      */
     public static RoleRecord toDomain(UpdateRoleDto dto) {
         return new RoleRecord(
                 dto.id(),
                 dto.name(),
                 dto.description(),
-                null   // el active REAL lo define la capa de aplicación
+                null
         );
     }
 
     /**
-     * Convierte un RoleRecord en un DTO para exponerlo al cliente.
-     *
-     * @param record entidad del dominio
-     * @return DTO serializable para transporte web
+     * Transformación del record del dominio hacia el DTO expuesto al cliente.
      */
     public static RoleResponseDto toResponse(RoleRecord record) {
         return new RoleResponseDto(

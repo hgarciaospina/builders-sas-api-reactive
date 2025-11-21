@@ -5,16 +5,25 @@ import com.builderssas.api.infrastructure.web.dto.constructiontype.ConstructionT
 import com.builderssas.api.infrastructure.web.dto.constructiontype.ConstructionTypeUpdateDto;
 import com.builderssas.api.infrastructure.web.dto.constructiontype.ConstructionTypeResponseDto;
 
-import org.springframework.stereotype.Component;
-
 /**
- * Mapper responsable de convertir entre los DTO utilizados en la capa web
- * y los records del dominio para tipos de construcción.
+ * Mapper Web estático para convertir entre:
+ *
+ *   • ConstructionTypeCreateDto → ConstructionTypeRecord
+ *   • ConstructionTypeUpdateDto → ConstructionTypeRecord
+ *   • ConstructionTypeRecord → ConstructionTypeResponseDto
+ *
+ * No contiene lógica de negocio.
+ * No se inyecta en controladores.
+ * No depende de Spring.
  */
-@Component
-public class ConstructionTypeWebMapper {
+public final class ConstructionTypeWebMapper {
 
-    public ConstructionTypeRecord toRecord(ConstructionTypeCreateDto dto) {
+    private ConstructionTypeWebMapper() { }
+
+    /**
+     * Convierte un DTO de creación en un record del dominio.
+     */
+    public static ConstructionTypeRecord toRecord(ConstructionTypeCreateDto dto) {
         return new ConstructionTypeRecord(
                 null,
                 dto.name(),
@@ -23,16 +32,22 @@ public class ConstructionTypeWebMapper {
         );
     }
 
-    public ConstructionTypeRecord toRecord(Long id, ConstructionTypeUpdateDto dto) {
+    /**
+     * Convierte un DTO de actualización + id en un record del dominio.
+     */
+    public static ConstructionTypeRecord toRecord(Long id, ConstructionTypeUpdateDto dto) {
         return new ConstructionTypeRecord(
                 id,
                 dto.name(),
                 dto.estimatedDays(),
-                true // el estado se gestiona por delete-soft
+                true
         );
     }
 
-    public ConstructionTypeResponseDto toResponse(ConstructionTypeRecord r) {
+    /**
+     * Convierte un record del dominio en un DTO de respuesta.
+     */
+    public static ConstructionTypeResponseDto toResponse(ConstructionTypeRecord r) {
         return new ConstructionTypeResponseDto(
                 r.id(),
                 r.name(),
