@@ -1,42 +1,59 @@
 package com.builderssas.api.infrastructure.persistence.repository;
 
 import com.builderssas.api.infrastructure.persistence.entity.UserRoleEntity;
-import org.springframework.data.r2dbc.repository.R2dbcRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 /**
- * Repositorio R2DBC para la entidad {@link UserRoleEntity}.
+ * Repositorio R2DBC para la tabla "user_roles".
  *
- * Este componente pertenece a la capa de infraestructura dentro
- * de la Arquitectura Hexagonal y define directamente las operaciones
- * reactivas soportadas por Spring Data R2DBC sobre la tabla "user_roles".
- *
- * Características:
- *  • Implementación automática (Spring genera todo el código).
- *  • Totalmente reactivo (Flux/Mono).
- *  • Sin lógica de negocio — solo acceso a la BD.
- *
- * Consultas útiles:
- *  • findByUserId  – Obtener los roles de un usuario.
- *  • findByRoleId  – Obtener todos los usuarios con un rol.
+ * Sigue exactamente el estándar utilizado en UserR2dbcRepository:
+ *  - findAll() trae activos + inactivos
+ *  - findAllActive() solo activos
+ *  - findAllInactive() solo inactivos
+ *  - softDelete(id) realiza borrado lógico
  */
-@Repository
-public interface UserRoleR2dbcRepository extends R2dbcRepository<UserRoleEntity, Long> {
+public interface UserRoleR2dbcRepository extends ReactiveCrudRepository<UserRoleEntity, Long> {
 
     /**
-     * Obtiene todas las relaciones usuario-rol asignadas a un usuario específico.
-     *
-     * @param userId ID del usuario.
-     * @return Flux con todas las asignaciones.
+     * Busca asignaciones usuario-rol por user_id.
      */
+    @Query("SELECT * FROM user_roles WHERE user_id = :userId")
     Flux<UserRoleEntity> findByUserId(Long userId);
 
     /**
-     * Obtiene todas las asignaciones donde aparece un rol específico.
-     *
-     * @param roleId ID del rol.
-     * @return Flux con todas las asignaciones.
+     * Busca una asignación usuario-rol específica por usuario y rol.
      */
-    Flux<UserRoleEntity> findByRoleId(Long roleId);
+    @Query("""
+           SELECT * FROM user_roles 
+           WHERE user_id = :userId AND role_id = :roleId
+           LIMIT 1
+           """)
+    Mono<UserRoleEntity> findByUserIdAndRoleId(Long userId, Long roleId);
+
+    /**
+     * Lista TODOS (activos + inactivos)
+     */
+    @Query("SELECT * FROM user_roles ORDER BY active DESC, user_id ASC")
+    Flux<UserRoleEntity> findAll();
+
+    /**
+     * Lista SOLO activos.
+     */
+    @Query("SELECT * FROM user_roles WHERE active = TRUE ORDER BY user_id ASC")
+    Flux<UserRoleEntity> findAllActive();
+
+    /**
+     * Lista SOLO inactivos.
+     */
+    @Query("SELECT * FROM user_roles WHERE active = FALSE ORDER BY user_id ASC")
+    Flux<UserRoleEntity> findAllInactive();
+
+    /**
+     * Borrado lógico.
+     */
+    @Query("UPDATE user_roles SET active = FALSE WHERE id = :id")
+    Mono<Void> softDelete(Long id);
 }

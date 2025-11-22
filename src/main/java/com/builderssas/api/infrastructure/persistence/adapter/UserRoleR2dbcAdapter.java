@@ -3,24 +3,21 @@ package com.builderssas.api.infrastructure.persistence.adapter;
 import com.builderssas.api.domain.model.userrole.UserRoleRecord;
 import com.builderssas.api.domain.port.out.userrole.UserRoleRepositoryPort;
 import com.builderssas.api.infrastructure.persistence.entity.UserRoleEntity;
+import com.builderssas.api.infrastructure.persistence.mapper.UserRoleMapper;
 import com.builderssas.api.infrastructure.persistence.repository.UserRoleR2dbcRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * Adaptador R2DBC para la persistencia de asignaciones Usuario–Rol.
+ * Adaptador R2DBC para las operaciones de persistencia de UserRole.
  *
- * Implementa el puerto de salida UserRoleRepositoryPort dentro de la
- * Arquitectura Hexagonal. Su función es convertir entre:
- *
- *   • UserRoleRecord (dominio, inmutable)
- *   • UserRoleEntity (infraestructura, mutable técnica)
- *
- * No contiene lógica de negocio.
- * Su único objetivo es mantener una transición limpia y funcional
- * entre el dominio y la base de datos.
+ * Sigue exactamente el estándar del UserR2dbcAdapter:
+ *  - Cada método delega directamente al repositorio R2DBC.
+ *  - Conversión entre Entity y Record mediante UserRoleMapper.
+ *  - No contiene lógica de negocio.
  */
 @Component
 @RequiredArgsConstructor
@@ -28,71 +25,51 @@ public class UserRoleR2dbcAdapter implements UserRoleRepositoryPort {
 
     private final UserRoleR2dbcRepository repository;
 
-    // -------------------------------------------------------------------------
-    // Mapeo: Entity → Record
-    // -------------------------------------------------------------------------
-
-    private UserRoleRecord toDomain(UserRoleEntity e) {
-        return new UserRoleRecord(
-                e.getId(),
-                e.getUserId(),
-                e.getRoleId(),
-                e.getAssignedAt(),
-                e.getCreatedAt(),
-                e.getUpdatedAt(),
-                e.getActive()
-        );
-    }
-
-    // -------------------------------------------------------------------------
-    // Mapeo: Record → Entity (sin programación imperativa)
-    // -------------------------------------------------------------------------
-
-    private UserRoleEntity toEntity(UserRoleRecord r) {
-        return new UserRoleEntity(
-                r.id(),
-                r.userId(),
-                r.roleId(),
-                r.assignedAt(),
-                r.createdAt(),
-                r.updatedAt(),
-                r.active()
-        );
-    }
-
-    // -------------------------------------------------------------------------
-    // Implementación del Puerto OUT
-    // -------------------------------------------------------------------------
-
     @Override
     public Mono<UserRoleRecord> save(UserRoleRecord record) {
-        return Mono.just(record)
-                .map(this::toEntity)
-                .flatMap(repository::save)
-                .map(this::toDomain);
+        UserRoleEntity entity = UserRoleMapper.toEntity(record);
+        return repository.save(entity)
+                .map(UserRoleMapper::toDomain);
     }
 
     @Override
     public Mono<UserRoleRecord> findById(Long id) {
         return repository.findById(id)
-                .map(this::toDomain);
-    }
-
-    @Override
-    public Flux<UserRoleRecord> findByUserId(Long userId) {
-        return repository.findByUserId(userId)
-                .map(this::toDomain);
-    }
-
-    @Override
-    public Flux<UserRoleRecord> findByRoleId(Long roleId) {
-        return repository.findByRoleId(roleId)
-                .map(this::toDomain);
+                .map(UserRoleMapper::toDomain);
     }
 
     @Override
     public Flux<UserRoleRecord> findAll() {
         return repository.findAll()
-                .map(this::toDomain);
+                .map(UserRoleMapper::toDomain);
+    }
+
+    @Override
+    public Flux<UserRoleRecord> findAllActive() {
+        return repository.findAllActive()
+                .map(UserRoleMapper::toDomain);
+    }
+
+    @Override
+    public Flux<UserRoleRecord> findAllInactive() {
+        return repository.findAllInactive()
+                .map(UserRoleMapper::toDomain);
+    }
+
+    @Override
+    public Mono<Void> softDelete(Long id) {
+        return repository.softDelete(id);
+    }
+
+    @Override
+    public Flux<UserRoleRecord> findByUserId(Long userId) {
+        return repository.findByUserId(userId)
+                .map(UserRoleMapper::toDomain);
+    }
+
+    @Override
+    public Mono<UserRoleRecord> findByUserIdAndRoleId(Long userId, Long roleId) {
+        return repository.findByUserIdAndRoleId(userId, roleId)
+                .map(UserRoleMapper::toDomain);
     }
 }

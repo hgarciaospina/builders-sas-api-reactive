@@ -7,59 +7,63 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.time.LocalDateTime;
 
 /**
- * Entidad persistente que representa la relación usuario-rol en la base de datos.
+ * Entidad persistente e inmutable que representa la relación usuario-rol en la base de datos.
  *
  * Esta clase pertenece a la capa de Infraestructura dentro de la Arquitectura Hexagonal.
- * Refleja exactamente la estructura de la tabla "user_roles" y se utiliza únicamente
- * para interacción con la base de datos mediante Spring Data R2DBC.
+ * Refleja exactamente la estructura de la tabla "user_roles" y se utiliza exclusivamente
+ * para la persistencia mediante Spring Data R2DBC.
  *
  * Características:
- * - Constructor vacío requerido por R2DBC.
- * - Constructor completo utilizado por el Adapter para evitar lógica imperativa.
- * - Modelo mutable porque esta capa es técnica (no de dominio).
+ * - Totalmente inmutable: todos los campos son final.
+ * - No tiene setters ni constructor vacío.
+ * - Spring Data R2DBC utiliza el constructor completo para instanciar la entidad.
+ * - Los getters permiten el acceso de lectura requerido por el repositorio reactivo.
+ *
+ * Columnas mapeadas:
+ * - id          → id
+ * - userId      → user_id
+ * - roleId      → role_id
+ * - assignedAt  → assigned_at
+ * - createdAt   → created_at
+ * - updatedAt   → updated_at
+ * - active      → active
  */
 @Table("user_roles")
 public class UserRoleEntity {
 
     @Id
     @Column("id")
-    private Long id;
+    private final Long id;
 
     @Column("user_id")
-    private Long userId;
+    private final Long userId;
 
     @Column("role_id")
-    private Long roleId;
+    private final Long roleId;
 
     @Column("assigned_at")
-    private LocalDateTime assignedAt;
+    private final LocalDateTime assignedAt;
 
     @Column("created_at")
-    private LocalDateTime createdAt;
+    private final LocalDateTime createdAt;
 
     @Column("updated_at")
-    private LocalDateTime updatedAt;
+    private final LocalDateTime updatedAt;
 
     @Column("active")
-    private Boolean active;
+    private final Boolean active;
 
-    // -------------------------------------------------------
-    // Constructor vacío obligatorio para R2DBC
-    // -------------------------------------------------------
-    public UserRoleEntity() {}
+    /**
+     * Constructor completo requerido por Spring Data R2DBC para instanciar entidades inmutables.
+     */
+    public UserRoleEntity(Long id,
+                          Long userId,
+                          Long roleId,
+                          LocalDateTime assignedAt,
+                          LocalDateTime createdAt,
+                          LocalDateTime updatedAt,
+                          Boolean active) {
 
-    // -------------------------------------------------------
-    // Constructor completo (para mapeo funcional sin imperativa)
-    // -------------------------------------------------------
-    public UserRoleEntity(
-            Long id,
-            Long userId,
-            Long roleId,
-            LocalDateTime assignedAt,
-            LocalDateTime createdAt,
-            LocalDateTime updatedAt,
-            Boolean active
-    ) {
         this.id = id;
         this.userId = userId;
         this.roleId = roleId;
@@ -69,27 +73,31 @@ public class UserRoleEntity {
         this.active = active;
     }
 
-    // -------------------------------------------------------
-    // Getters & Setters (infraestructura técnica)
-    // -------------------------------------------------------
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getId() {
+        return id;
+    }
 
-    public Long getUserId() { return userId; }
-    public void setUserId(Long userId) { this.userId = userId; }
+    public Long getUserId() {
+        return userId;
+    }
 
-    public Long getRoleId() { return roleId; }
-    public void setRoleId(Long roleId) { this.roleId = roleId; }
+    public Long getRoleId() {
+        return roleId;
+    }
 
-    public LocalDateTime getAssignedAt() { return assignedAt; }
-    public void setAssignedAt(LocalDateTime assignedAt) { this.assignedAt = assignedAt; }
+    public LocalDateTime getAssignedAt() {
+        return assignedAt;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
 
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
 
-    public Boolean getActive() { return active; }
-    public void setActive(Boolean active) { this.active = active; }
+    public Boolean getActive() {
+        return active;
+    }
 }
