@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: builders-sas-api-reactive
+
+  jackson:
+    default-property-inclusion: non_empty
+
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/builders_sas_hexagonal
+    username: postgres
+    password: Leandro2009*
+
+  sql:
+    init:
+      mode: never
+
+server:
+  port: 9090
+
+logging:
+  level:
+    # 🔥 Ver solo errores REALES de tu API
+    root: INFO
+    com.builderssas: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.http: DEBUG
+
+    # 🔥 Mostrar errores de WebFlux (pero no todo Netty)
+    org.springframework.r2dbc: ERROR
+    reactor.netty.http.client: ERROR
+
+    # ❌ Quitar ruido innecesario
+    io.r2dbc.postgresql: ERROR
+    reactor.netty: ERROR
