@@ -7,17 +7,21 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.time.LocalDateTime;
 
 /**
- * Entidad persistente e inmutable que representa la relación usuario-rol en la base de datos.
+ * Entidad persistente e inmutable que representa la relación usuario-rol.
  *
- * Esta clase pertenece a la capa de Infraestructura dentro de la Arquitectura Hexagonal.
- * Refleja exactamente la estructura de la tabla "user_roles" y se utiliza exclusivamente
- * para la persistencia mediante Spring Data R2DBC.
+ * Pertenece a la capa de Infraestructura dentro de la Arquitectura Hexagonal.
+ * Su única responsabilidad es mapear la tabla "user_roles".
  *
- * Características:
- * - Totalmente inmutable: todos los campos son final.
- * - No tiene setters ni constructor vacío.
- * - Spring Data R2DBC utiliza el constructor completo para instanciar la entidad.
- * - Los getters permiten el acceso de lectura requerido por el repositorio reactivo.
+ * Reglas de diseño:
+ * - Inmutable: todos los campos son final
+ * - Sin setters
+ * - Constructor completo requerido por Spring Data R2DBC
+ * - No contiene lógica de negocio (solo persistencia)
+ *
+ * Consideraciones importantes:
+ * - El atributo "active" se modela como primitivo boolean para evitar nulls
+ * - Se expone mediante el método isActive() siguiendo estándar JavaBeans
+ * - Permite uso limpio en programación funcional (WebFlux)
  *
  * Columnas mapeadas:
  * - id          → id
@@ -29,7 +33,7 @@ import java.time.LocalDateTime;
  * - active      → active
  */
 @Table("user_roles")
-public class UserRoleEntity {
+public final class UserRoleEntity {
 
     @Id
     @Column("id")
@@ -51,10 +55,11 @@ public class UserRoleEntity {
     private final LocalDateTime updatedAt;
 
     @Column("active")
-    private final Boolean active;
+    private final boolean active;
 
     /**
-     * Constructor completo requerido por Spring Data R2DBC para instanciar entidades inmutables.
+     * Constructor completo requerido por Spring Data R2DBC
+     * para entidades inmutables.
      */
     public UserRoleEntity(Long id,
                           Long userId,
@@ -62,7 +67,7 @@ public class UserRoleEntity {
                           LocalDateTime assignedAt,
                           LocalDateTime createdAt,
                           LocalDateTime updatedAt,
-                          Boolean active) {
+                          boolean active) {
 
         this.id = id;
         this.userId = userId;
@@ -97,7 +102,12 @@ public class UserRoleEntity {
         return updatedAt;
     }
 
-    public Boolean getActive() {
+    /**
+     * Indica si la relación usuario-rol está activa.
+     *
+     * @return true si está activa, false si fue desactivada (soft delete)
+     */
+    public boolean isActive() {
         return active;
     }
 }

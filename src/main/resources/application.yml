@@ -1,4 +1,7 @@
 spring:
+  config:
+    import: optional:classpath:.env
+
   application:
     name: builders-sas-api-reactive
 
@@ -16,6 +19,11 @@ spring:
 
 server:
   port: 9090
+
+jwt:
+  secret-key: ${JWT_SECRET_KEY}
+  access-token-expiration-seconds: ${JWT_ACCESS_EXPIRATION}
+  refresh-token-expiration-seconds: ${JWT_REFRESH_EXPIRATION}
 
 logging:
   level:

@@ -1,4 +1,4 @@
-package com.builderssas.api.infrastructure.persistence.adapter;
+package com.builderssas.api.infrastructure.persistence.adapter.ordermaterialsnapshot;
 
 import com.builderssas.api.domain.model.ordermaterialsnapshot.OrderMaterialSnapshotRecord;
 import com.builderssas.api.domain.port.out.ordermaterialsnapshot.OrderMaterialSnapshotRepositoryPort;

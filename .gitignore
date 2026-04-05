@@ -1,22 +1,95 @@
-# Maven
+# =========================
+# ENVIRONMENT (CRÍTICO)
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# MAVEN
+# =========================
 target/
 !.mvn/wrapper/maven-wrapper.jar
 .mvn/wrapper/maven-wrapper.properties
 
-# IntelliJ
-.idea/
-*.iml
-
-# Logs
-*.log
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Java
+# =========================
+# BUILD / COMPILATION
+# =========================
+build/
+out/
 *.class
 
-# Build dirs
-out/
-build/
+# =========================
+# LOGS
+# =========================
+logs/
+*.log
+*.out
+*.err
+
+# =========================
+# INTELLIJ IDEA
+# =========================
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# =========================
+# VSCODE
+# =========================
+.vscode/
+
+# =========================
+# ECLIPSE
+# =========================
+.project
+.classpath
+.settings/
+
+# =========================
+# OS FILES
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =========================
+# TEMP FILES
+# =========================
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# =========================
+# TEST / COVERAGE
+# =========================
+coverage/
+*.lcov
+*.exec
+
+# =========================
+# DOCKER
+# =========================
+docker-compose.override.yml
+
+# =========================
+# SECURITY / KEYS
+# =========================
+*.key
+*.pem
+*.p12
+*.jks
+
+# =========================
+# SPRING BOOT
+# =========================
+*.pid
+*.seed
+
+# =========================
+# CACHE
+# =========================
+.cache/

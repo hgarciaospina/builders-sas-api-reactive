@@ -1,10 +1,17 @@
 package com.builderssas.api.domain.port.in.auth;
 
-import com.builderssas.api.infrastructure.web.dto.auth.LoginDto;
-import com.builderssas.api.infrastructure.web.dto.auth.AuthResultDto;
+import com.builderssas.api.domain.model.auth.AuthSessionRecord;
 import reactor.core.publisher.Mono;
 
+/**
+ * Caso de uso de login.
+ */
 public interface LoginUseCase {
 
-    Mono<AuthResultDto> login(LoginDto dto);
+    /**
+     * Ejecuta autenticación.
+     *
+     * @return sesión autenticada con tokens
+     */
+    Mono<AuthSessionRecord> login(String username, String password);
 }

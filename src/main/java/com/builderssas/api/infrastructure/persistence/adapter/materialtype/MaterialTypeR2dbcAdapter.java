@@ -1,4 +1,4 @@
-package com.builderssas.api.infrastructure.persistence.adapter;
+package com.builderssas.api.infrastructure.persistence.adapter.materialtype;
 
 import com.builderssas.api.domain.model.materialtype.MaterialTypeRecord;
 import com.builderssas.api.domain.port.out.materialtype.MaterialTypeRepositoryPort;

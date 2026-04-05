@@ -1,4 +1,4 @@
-package com.builderssas.api.infrastructure.persistence.adapter;
+package com.builderssas.api.infrastructure.persistence.adapter.user;
 
 import com.builderssas.api.domain.model.user.UserRecord;
 import com.builderssas.api.domain.port.out.user.UserRepositoryPort;

@@ -1,4 +1,4 @@
-package com.builderssas.api.infrastructure.persistence.adapter;
+package com.builderssas.api.infrastructure.persistence.adapter.notification;
 
 import com.builderssas.api.domain.model.notification.NotificationRecord;
 import com.builderssas.api.domain.port.out.notification.NotificationRepositoryPort;

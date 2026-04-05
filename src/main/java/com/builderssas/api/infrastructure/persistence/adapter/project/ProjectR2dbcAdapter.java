@@ -1,4 +1,4 @@
-package com.builderssas.api.infrastructure.persistence.adapter;
+package com.builderssas.api.infrastructure.persistence.adapter.project;
 
 import com.builderssas.api.domain.model.project.ProjectRecord;
 import com.builderssas.api.domain.port.out.project.ProjectRepositoryPort;

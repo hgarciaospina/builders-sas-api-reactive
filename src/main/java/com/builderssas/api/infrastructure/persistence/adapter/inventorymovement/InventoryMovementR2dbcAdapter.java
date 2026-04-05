@@ -1,4 +1,4 @@
-package com.builderssas.api.infrastructure.persistence.adapter;
+package com.builderssas.api.infrastructure.persistence.adapter.inventorymovement;
 
 import com.builderssas.api.domain.model.inventorymovement.InventoryMovementRecord;
 import com.builderssas.api.domain.port.out.inventorymovement.InventoryMovementRepositoryPort;

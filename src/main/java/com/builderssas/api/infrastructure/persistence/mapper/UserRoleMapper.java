@@ -24,7 +24,7 @@ public final class UserRoleMapper {
                 entity.getAssignedAt(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt(),
-                entity.getActive()
+                entity.isActive()
         );
     }
 

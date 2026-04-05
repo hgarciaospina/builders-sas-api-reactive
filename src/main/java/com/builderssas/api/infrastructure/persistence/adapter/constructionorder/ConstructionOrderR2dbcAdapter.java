@@ -1,4 +1,4 @@
-package com.builderssas.api.infrastructure.persistence.adapter;
+package com.builderssas.api.infrastructure.persistence.adapter.constructionorder;
 
 import com.builderssas.api.domain.model.constructionorder.ConstructionOrderRecord;
 import com.builderssas.api.domain.port.out.constructionorder.ConstructionOrderRepositoryPort;

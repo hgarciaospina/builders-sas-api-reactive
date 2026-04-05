@@ -1,4 +1,4 @@
-package com.builderssas.api.infrastructure.persistence.adapter;
+package com.builderssas.api.infrastructure.persistence.adapter.role;
 
 import com.builderssas.api.domain.model.role.RoleRecord;
 import com.builderssas.api.domain.port.out.role.RoleRepositoryPort;
