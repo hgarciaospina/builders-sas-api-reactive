@@ -11,29 +11,28 @@ import com.builderssas.api.infrastructure.persistence.entity.UserRoleEntity;
 import com.builderssas.api.infrastructure.persistence.repository.RoleR2dbcRepository;
 import com.builderssas.api.infrastructure.persistence.repository.UserR2dbcRepository;
 import com.builderssas.api.infrastructure.persistence.repository.UserRoleR2dbcRepository;
-
+import com.builderssas.api.infrastructure.web.handler.GlobalExceptionHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
- * Caso de uso: Refresh Token con soporte multi-rol.
+ * Caso de uso: Refresh Token con rotación y soporte multi-rol.
  *
  * Responsabilidades:
  * - Validar REFRESH token persistido
  * - Revocar el REFRESH token usado
- * - Resolver todos los roles activos del usuario
- * - Generar un nuevo ACCESS token con roles incluidos
- * - Persistir el ACCESS token
+ * - Generar nuevo par ACCESS + REFRESH
+ * - Persistir ambos tokens
+ * - Devolver solo el ACCESS token nuevo
  *
  * Reglas:
  * - 100% funcional y reactivo
+ * - Rotación: cada refresh invalida el anterior aunque solo devuelva el access
  * - No contiene lógica HTTP ni DTOs web
  */
 @Service
@@ -55,34 +54,14 @@ public final class RefreshTokenService implements RefreshTokenUseCase {
      */
     @Override
     public Mono<String> refresh(String refreshToken) {
-        LocalDateTime now = LocalDateTime.now(zoneId);
+        String cleanToken = refreshToken.trim();
 
-        return tokenRepository.findByToken(refreshToken)
-                // Validar que sea REFRESH válido
+        return tokenRepository.findByToken(cleanToken)
                 .filter(this::isValidRefreshToken)
-                .switchIfEmpty(Mono.error(new IllegalStateException("Refresh token inválido o expirado")))
-
-                // Revocar el REFRESH token usado
-                .flatMap(this::revokeRefreshToken)
-
-                // Obtener usuario
-                .flatMap(revokedToken -> userRepository.findById(revokedToken.userId())
-                        .switchIfEmpty(Mono.error(new IllegalStateException("Usuario no encontrado para refresh")))
-                )
-
-                // Resolver roles y construir usuario autenticado
-                .flatMap(user -> resolveUserRoles(user.getId())
-                        .map(roles -> new AuthenticatedUserRecord(
-                                user.getId(),
-                                user.getUsername(),
-                                roles,
-                                user.getDisplayName()
-                        ))
-                )
-
-                // Generar ACCESS token y persistirlo
-                .flatMap(this::generateAndPersistAccessToken)
-                .map(AuthTokenRecord::token); // devolver solo el token
+                .switchIfEmpty(Mono.error(
+                        new GlobalExceptionHandler.UnauthorizedException("Refresh token inválido o expirado")
+                ))
+                .flatMap(this::rotateTokensAndReturnAccess);
     }
 
     /**
@@ -96,30 +75,66 @@ public final class RefreshTokenService implements RefreshTokenUseCase {
     }
 
     /**
-     * Revoca el REFRESH token usado.
-     *
-     * @param record token REFRESH
-     * @return Mono con token revocado persistido
+     * Rota tokens: revoca el refresh viejo, genera access + refresh nuevos.
+     * Devuelve solo el access nuevo para cumplir el contrato.
      */
-    private Mono<AuthTokenRecord> revokeRefreshToken(AuthTokenRecord record) {
+    private Mono<String> rotateTokensAndReturnAccess(AuthTokenRecord oldRefresh) {
+        // 1. Revocar el refresh usado - mantengo createdAt original
         AuthTokenRecord revoked = new AuthTokenRecord(
-                record.id(),
-                record.userId(),
-                record.token(),
-                TokenType.REFRESH,
-                record.issuedAt(),
-                record.expiresAt(),
+                oldRefresh.id(),
+                oldRefresh.userId(),
+                oldRefresh.token(),
+                oldRefresh.tokenType(),
+                oldRefresh.issuedAt(),
+                oldRefresh.expiresAt(),
                 true,
-                LocalDateTime.now(zoneId)
+                oldRefresh.createdAt()
         );
-        return tokenRepository.save(revoked);
+
+        // 2. Resolver usuario + roles para generar tokens nuevos
+        return userRepository.findById(oldRefresh.userId())
+                .switchIfEmpty(Mono.error(
+                        new GlobalExceptionHandler.ResourceNotFoundException("Usuario no encontrado")
+                ))
+                .flatMap(user -> resolveUserRoles(user.getId())
+                        .map(roles -> new AuthenticatedUserRecord(
+                                user.getId(),
+                                user.getUsername(),
+                                roles,
+                                user.getDisplayName()
+                        ))
+                )
+                .flatMap(authUser ->
+                        // 3. Revocar viejo + generar y guardar ambos, devolver solo access
+                        tokenRepository.save(revoked)
+                                .then(jwtTokenGenerator.generateAccessToken(authUser))
+                                .flatMap(newAccess -> {
+                                    LocalDateTime now = LocalDateTime.now(zoneId);
+                                    AuthTokenRecord accessRecord = new AuthTokenRecord(
+                                            null, authUser.userId(), newAccess, TokenType.ACCESS,
+                                            now, now.plusMinutes(15), false, now
+                                    );
+                                    return tokenRepository.save(accessRecord)
+                                            .thenReturn(newAccess); // guardo el access para devolverlo
+                                })
+                                .zipWhen(access ->
+                                        // 4. Generar y guardar el refresh nuevo también, pero no lo devuelvo
+                                        jwtTokenGenerator.generateRefreshToken(authUser)
+                                                .flatMap(newRefresh -> {
+                                                    LocalDateTime now = LocalDateTime.now(zoneId);
+                                                    AuthTokenRecord refreshRecord = new AuthTokenRecord(
+                                                            null, authUser.userId(), newRefresh, TokenType.REFRESH,
+                                                            now, now.plusDays(30), false, now
+                                                    );
+                                                    return tokenRepository.save(refreshRecord);
+                                                })
+                                )
+                                .map(tuple -> tuple.getT1()) // devuelvo solo el access del primer Mono
+                );
     }
 
     /**
      * Resuelve todos los roles activos de un usuario como lista de strings.
-     *
-     * @param userId id del usuario
-     * @return Mono con lista de nombres de roles
      */
     private Mono<List<String>> resolveUserRoles(Long userId) {
         return userRoleRepository.findByUserId(userId)
@@ -128,31 +143,6 @@ public final class RefreshTokenService implements RefreshTokenUseCase {
                 .map(RoleEntity::getName)
                 .collectList()
                 .filter(list -> !list.isEmpty())
-                .switchIfEmpty(Mono.just(List.of("ROLE_SUPPORT"))); // rol default si no hay ninguno
-    }
-
-    /**
-     * Genera un nuevo ACCESS token para el usuario con roles resueltos y lo persiste.
-     *
-     * @param user usuario autenticado
-     * @return Mono con AuthTokenRecord persistido
-     */
-    private Mono<AuthTokenRecord> generateAndPersistAccessToken(AuthenticatedUserRecord user) {
-        LocalDateTime now = LocalDateTime.now(zoneId);
-
-        return jwtTokenGenerator.generateAccessToken(user) // devuelve Mono<String>
-                .flatMap(accessToken -> {
-                    AuthTokenRecord accessTokenRecord = new AuthTokenRecord(
-                            null,
-                            user.userId(),
-                            accessToken,
-                            TokenType.ACCESS,
-                            now,
-                            now.plusMinutes(60), // duración ACCESS
-                            false,
-                            now
-                    );
-                    return tokenRepository.save(accessTokenRecord);
-                });
+                .switchIfEmpty(Mono.just(List.of("ROLE_USER")));
     }
 }

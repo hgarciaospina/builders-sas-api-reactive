@@ -14,7 +14,6 @@ import java.util.List;
  * - No contiene credenciales ni información sensible
  *
  * Este modelo:
- * - No contiene lógica de negocio
  * - No conoce infraestructura
  * - No conoce HTTP
  *

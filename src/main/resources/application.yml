@@ -27,7 +27,7 @@ jwt:
 
 logging:
   level:
-    # 🔥 Ver solo errores REALES de tu API
+    # 🔥 Ver solo errores REALES de la API
     root: INFO
     com.builderssas: DEBUG
     org.springframework.web: DEBUG

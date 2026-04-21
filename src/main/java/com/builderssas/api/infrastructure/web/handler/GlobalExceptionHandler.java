@@ -1,5 +1,6 @@
 package com.builderssas.api.infrastructure.web.handler;
 
+import com.builderssas.api.application.exception.DataInconsistencyException;
 import com.builderssas.api.infrastructure.web.validation.FieldOrderProvider;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -55,6 +56,15 @@ public class GlobalExceptionHandler {
     }
 
     // =========================================================================
+    // 422 — Inconsistencia de datos (DataInconsistencyException)
+    // =========================================================================
+    @ExceptionHandler(DataInconsistencyException.class)
+    public ResponseEntity<Map<String, Object>> handleDataInconsistency(DataInconsistencyException ex) {
+        var status = HttpStatus.UNPROCESSABLE_ENTITY;
+        return ResponseEntity.status(status).body(body(status, ex.getMessage()));
+    }
+
+    // =========================================================================
     // 404 — Recurso no encontrado
     // =========================================================================
     @ExceptionHandler(ResourceNotFoundException.class)
@@ -64,7 +74,7 @@ public class GlobalExceptionHandler {
     }
 
     // =========================================================================
-    // 409 — Recurso duplicado
+    // 409 — Recurso duplicado (regla de dominio)
     // =========================================================================
     @ExceptionHandler(DuplicateResourceException.class)
     public ResponseEntity<Map<String, Object>> handleDuplicate(DuplicateResourceException ex) {
@@ -78,7 +88,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Map<String, Object>> handleDataIntegrity(DataIntegrityViolationException ex) {
         var status = HttpStatus.CONFLICT;
-        return ResponseEntity.status(status).body(body(status, "Violación de integridad de datos."));
+        return ResponseEntity.status(status).body(body(status,
+                "Operación no permitida: violación de integridad de datos en la base de datos."
+        ));
     }
 
     // =========================================================================
@@ -87,16 +99,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(WebExchangeBindException.class)
     public ResponseEntity<Map<String, Object>> handleWebFluxValidation(WebExchangeBindException ex) {
 
-        /**
-         * Determina el orden de campos basado en el DTO:
-         * - Si el DTO implementa FieldOrderProvider → usa fieldOrder().
-         * - Si no → usa el orden natural de los errores de WebFlux.
-         *
-         * Esto garantiza:
-         * - Un solo error.
-         * - En el orden exacto definido por el DTO.
-         * - Sin mostrar el nombre del atributo.
-         */
         var order = Optional.ofNullable(ex.getTarget())
                 .filter(FieldOrderProvider.class::isInstance)
                 .map(FieldOrderProvider.class::cast)
@@ -107,11 +109,6 @@ public class GlobalExceptionHandler {
                                 .toList()
                 );
 
-        /**
-         * Selecciona el primer mensaje de error según el orden declarado.
-         * Si por alguna razón no existe ningún error (lo cual sería un fallo
-         * de programación), se lanza una excepción explícita.
-         */
         var firstError = order.stream()
                 .flatMap(field ->
                         ex.getFieldErrors().stream()
@@ -128,15 +125,11 @@ public class GlobalExceptionHandler {
     }
 
     // =========================================================================
-    // 400 — Validaciones de parámetros (@PathVariable, @RequestParam, etc.)
+    // 400 — Validaciones de parámetros
     // =========================================================================
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Map<String, Object>> handleConstraintViolation(ConstraintViolationException ex) {
 
-        /**
-         * Solo se toma la primera violación de restricción.
-         * Nunca se muestra "Datos inválidos".
-         */
         var error = ex.getConstraintViolations()
                 .stream()
                 .findFirst()
@@ -159,7 +152,7 @@ public class GlobalExceptionHandler {
     }
 
     // =========================================================================
-    // 403 — Prohibido (sin permisos)
+    // 403 — Prohibido
     // =========================================================================
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<Map<String, Object>> handleForbidden(ForbiddenException ex) {
@@ -168,11 +161,20 @@ public class GlobalExceptionHandler {
     }
 
     // =========================================================================
-    // 422 — Errores de dominio (reglas de negocio)
+    // 422 — Reglas de negocio
     // =========================================================================
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<Map<String, Object>> handleBusiness(BusinessException ex) {
         var status = HttpStatus.UNPROCESSABLE_ENTITY;
+        return ResponseEntity.status(status).body(body(status, ex.getMessage()));
+    }
+
+    // =========================================================================
+    // 400 — Reglas inválidas
+    // =========================================================================
+    @ExceptionHandler(InvalidBusinessRuleException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidBusiness(InvalidBusinessRuleException ex) {
+        var status = HttpStatus.BAD_REQUEST;
         return ResponseEntity.status(status).body(body(status, ex.getMessage()));
     }
 
@@ -182,12 +184,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneric(Exception ex) {
         var status = HttpStatus.INTERNAL_SERVER_ERROR;
-        return ResponseEntity.status(status).body(body(status, ex.getMessage()));
-    }
-
-    @ExceptionHandler(InvalidBusinessRuleException.class)
-    public ResponseEntity<Map<String, Object>> handleInvalidBusiness(InvalidBusinessRuleException ex) {
-        var status = HttpStatus.BAD_REQUEST;
         return ResponseEntity.status(status).body(body(status, ex.getMessage()));
     }
 

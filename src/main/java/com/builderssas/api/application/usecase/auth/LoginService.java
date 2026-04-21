@@ -1,5 +1,6 @@
 package com.builderssas.api.application.usecase.auth;
 
+import com.builderssas.api.application.exception.DataInconsistencyException;
 import com.builderssas.api.domain.model.auth.AuthSessionRecord;
 import com.builderssas.api.domain.model.auth.AuthenticatedUserRecord;
 import com.builderssas.api.domain.model.auth.AuthTokenRecord;
@@ -14,6 +15,7 @@ import com.builderssas.api.infrastructure.persistence.repository.UserR2dbcReposi
 import com.builderssas.api.infrastructure.persistence.repository.UserRoleR2dbcRepository;
 import com.builderssas.api.infrastructure.persistence.repository.RoleR2dbcRepository;
 
+import com.builderssas.api.infrastructure.web.handler.GlobalExceptionHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -33,7 +35,7 @@ import java.time.ZoneId;
  * Características:
  * - 100% funcional y reactivo
  * - Compatible con DDD y arquitectura hexagonal
- * - No contiene lógica de infraestructura ni imperativa
+ * - Sin lógica imperativa
  */
 @Service
 @RequiredArgsConstructor
@@ -49,70 +51,95 @@ public class LoginService implements LoginUseCase {
 
     @Override
     public Mono<AuthSessionRecord> login(String username, String password) {
+
         LocalDateTime now = LocalDateTime.now(zoneId);
 
         return userRepository.findByUsername(username)
-                .switchIfEmpty(Mono.error(new IllegalStateException("Usuario no encontrado")))
+                .switchIfEmpty(Mono.error(
+                        new GlobalExceptionHandler
+                                .ResourceNotFoundException("Usuario no encontrado")
+                ))
 
-                // Validar credenciales
+                // Validación de credenciales
                 .flatMap(user -> authRepository.findByUserId(user.getId())
-                        .switchIfEmpty(Mono.error(new IllegalStateException("Credenciales no encontradas")))
-                        .filter(auth -> org.mindrot.jbcrypt.BCrypt.checkpw(password, auth.passwordHash()))
-                        .switchIfEmpty(Mono.error(new SecurityException("Contraseña incorrecta")))
+                        .switchIfEmpty(Mono.error(
+                                new GlobalExceptionHandler
+                                        .ResourceNotFoundException("Credenciales no encontradas")
+                        ))
+                        .filter(auth ->
+                                org.mindrot.jbcrypt.BCrypt.checkpw(password, auth.passwordHash())
+                        )
+                        .switchIfEmpty(Mono.error(
+                                new GlobalExceptionHandler
+                                        .UnauthorizedException("Contraseña incorrecta")
+                        ))
                         .map(auth -> user)
                 )
 
-                // Obtener roles de manera funcional
-                .flatMap(user -> userRoleRepository.findByUserId(user.getId())
-                        .flatMap(userRole -> roleRepository.findById(userRole.getRoleId()))
-                        .map(RoleEntity::getName)
-                        .collectList()
-                        .filter(roleNames -> !roleNames.isEmpty())
-                        .switchIfEmpty(Mono.error(new IllegalStateException("No se encontraron roles asignados")))
-                        .map(roleNames -> new AuthenticatedUserRecord(
-                                user.getId(),
-                                user.getUsername(),
-                                roleNames,
-                                user.getDisplayName()
-                        ))
+                // Resolución de roles
+                .flatMap(user ->
+                        userRoleRepository.findByUserId(user.getId())
+                                .flatMap(userRole ->
+                                        roleRepository.findById(userRole.getRoleId())
+                                )
+                                .map(RoleEntity::getName)
+                                .collectList()
+                                .filter(roleNames -> !roleNames.isEmpty())
+                                .switchIfEmpty(Mono.error(
+                                        new DataInconsistencyException(
+                                                "No se encontraron roles asignados"
+                                        )
+                                ))
+                                .map(roleNames -> new AuthenticatedUserRecord(
+                                        user.getId(),
+                                        user.getUsername(),
+                                        roleNames,
+                                        user.getDisplayName()
+                                ))
                 )
 
-                // Generar tokens de forma 100% reactiva
+                // Generación de tokens
                 .flatMap(authUser ->
                         jwtTokenGenerator.generateAccessToken(authUser)
                                 .flatMap(accessToken ->
                                         jwtTokenGenerator.generateRefreshToken(authUser)
                                                 .flatMap(refreshToken -> {
 
-                                                    // Crear registros de tokens
-                                                    AuthTokenRecord accessTokenRecord = new AuthTokenRecord(
-                                                            null,
-                                                            authUser.userId(),
-                                                            accessToken,
-                                                            TokenType.ACCESS,
-                                                            now,
-                                                            now.plusMinutes(15),
-                                                            false,
-                                                            now
-                                                    );
+                                                    AuthTokenRecord accessTokenRecord =
+                                                            new AuthTokenRecord(
+                                                                    null,
+                                                                    authUser.userId(),
+                                                                    accessToken,
+                                                                    TokenType.ACCESS,
+                                                                    now,
+                                                                    now.plusMinutes(15),
+                                                                    false,
+                                                                    now
+                                                            );
 
-                                                    AuthTokenRecord refreshTokenRecord = new AuthTokenRecord(
-                                                            null,
-                                                            authUser.userId(),
-                                                            refreshToken,
-                                                            TokenType.REFRESH,
-                                                            now,
-                                                            now.plusDays(7),
-                                                            false,
-                                                            now
-                                                    );
+                                                    AuthTokenRecord refreshTokenRecord =
+                                                            new AuthTokenRecord(
+                                                                    null,
+                                                                    authUser.userId(),
+                                                                    refreshToken,
+                                                                    TokenType.REFRESH,
+                                                                    now,
+                                                                    now.plusDays(7),
+                                                                    false,
+                                                                    now
+                                                            );
 
-                                                    // Guardar tokens en paralelo
                                                     return Mono.when(
                                                                     authTokenRepository.save(accessTokenRecord),
                                                                     authTokenRepository.save(refreshTokenRecord)
                                                             )
-                                                            .thenReturn(new AuthSessionRecord(authUser, accessToken, refreshToken));
+                                                            .thenReturn(
+                                                                    new AuthSessionRecord(
+                                                                            authUser,
+                                                                            accessToken,
+                                                                            refreshToken
+                                                                    )
+                                                            );
                                                 })
                                 )
                 );
